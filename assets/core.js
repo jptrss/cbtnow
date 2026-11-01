@@ -3,7 +3,7 @@ import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasej
 import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ===== PASTE YOUR FIREBASE CONFIG HERE (used by every role page) =====
-export const CFG={apiKey:"YOUR_API_KEY",authDomain:"YOUR_PROJECT.firebaseapp.com",projectId:"YOUR_PROJECT_ID",appId:"YOUR_APP_ID"};
+export const CFG={apiKey:"AIzaSyDHGqit0SiTiIL5Z2Xv28oWueH6sHdTlSw",authDomain:"cbtnow-myown.firebaseapp.com",projectId:"cbtnow-myown",  appId: "1:550333230262:web:f6aca07372fbe950f64a17"};
 // Usernames without "@" become username@USERNAME_DOMAIN (same value as in the login page)
 export const USERNAME_DOMAIN="cbtnow.app";
 // =====================================================================
