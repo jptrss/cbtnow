@@ -71,11 +71,11 @@ import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-ap
 import{getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,sendPasswordResetEmail,updatePassword}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 // ===== PASTE YOUR FIREBASE CONFIG HERE =====
-const CFG={apiKey:"YOUR_API_KEY",authDomain:"YOUR_PROJECT.firebaseapp.com",projectId:"YOUR_PROJECT_ID",appId:"YOUR_APP_ID"};
+const CFG={apiKey:"AIzaSyDHGqit0SiTiIL5Z2Xv28oWueH6sHdTlSw",authDomain:"cbtnow-myown.firebaseapp.com",projectId:"cbtnow-myown",appId:"1:550333230262:web:f6aca07372fbe950f64a17"};
 // Usernames without "@" are converted to username@USERNAME_DOMAIN (must match how accounts are created)
 const USERNAME_DOMAIN="cbtnow.app";
 // Where each role goes after sign-in (dashboards are built in the next steps)
-const ROUTES={OPERATOR:"/operator",MANAGEMENT:"/management",PROBLEM_SETTER:"/setter",PROCTOR:"/proctor",PARTICIPANT:"/participant"};
+const ROUTES={OPERATOR:"/operator",MANAGEMENT:"/management",PROBLEM_SETTER:"/probset",PROCTOR:"/proctor",PARTICIPANT:"/participant"};
 // ===========================================
 const auth=getAuth(initializeApp(CFG)),db=getFirestore(auth.app),$=s=>document.querySelector(s);
 const toEmail=v=>{v=v.trim();return v.includes("@")?v:v.toLowerCase()+"@"+USERNAME_DOMAIN};
