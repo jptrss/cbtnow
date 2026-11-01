@@ -26,8 +26,15 @@ import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-ap
 import{getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,sendPasswordResetEmail,createUserWithEmailAndPassword}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import{getFirestore,collection,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,onSnapshot,query,where,arrayUnion}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 // ===== 1. PASTE YOUR FIREBASE CONFIG HERE =====
-const CFG={apiKey:"YOUR_API_KEY",authDomain:"YOUR_PROJECT.firebaseapp.com",projectId:"YOUR_PROJECT_ID",appId:"YOUR_APP_ID"};
-// ==============================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDHGqit0SiTiIL5Z2Xv28oWueH6sHdTlSw",
+  authDomain: "cbtnow-myown.firebaseapp.com",
+  projectId: "cbtnow-myown",
+  storageBucket: "cbtnow-myown.firebasestorage.app",
+  messagingSenderId: "550333230262",
+  appId: "1:550333230262:web:f6aca07372fbe950f64a17",
+  measurementId: "G-S4SWSPYCD1"
+};// ==============================================
 const app=initializeApp(CFG),auth=getAuth(app),db=getFirestore(app),auth2=getAuth(initializeApp(CFG,"s2"));
 const A=window.A={},$=window.$=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
