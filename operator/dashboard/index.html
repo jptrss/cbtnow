@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard · Operator · CBTNow</title><meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2724%27 fill=%27%236366f1%27/><path d=%27M28 52l16 16 30-34%27 stroke=%27white%27 stroke-width=%2712%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="/assets/theme.css"></head>
+<body><div class="bgfx"></div><div class="load" id="load"><i></i></div>
+<div class="app"><aside id="side"></aside><main>
+<section class="hero"><div><h1 id="gr"></h1><p>Operator · System administrator</p></div><div class="clk"><div class="big mono" id="ck"></div><small id="dtx"></small></div></section>
+<div class="stats" id="stats"></div>
+<div class="cols">
+<div><div class="card"><h3>Create management account</h3>
+<form id="cf" novalidate>
+<label for="n">Organization name</label><input id="n" required placeholder="e.g. SMA Negeri 1">
+<label for="e">Username or email</label><input id="e" required autocomplete="off" placeholder="admin@school.org">
+<label for="p">Password (min. 8 characters)</label><div class="rw"><input id="p" type="text" autocomplete="off" required><button type="button" class="btn s" id="gen">Generate</button></div>
+<label for="d">Work description</label><textarea id="d" placeholder="What does this organization do?"></textarea>
+<label for="l">Logo (PNG/JPG, resized automatically)</label><input id="l" type="file" accept="image/*">
+<button class="btn p w" id="cb">Create account</button></form>
+<div class="cred" id="cred"></div></div></div>
+<div class="card"><h3><span>Management accounts</span><input id="q" placeholder="Search…" style="width:200px;padding:8px 12px"></h3><div id="list"></div></div>
+</div></main></div>
+
+<div class="mo" id="mo"><form class="card" id="ef" novalidate><h3>Edit account</h3>
+<label>Email / username</label><input id="ee" disabled>
+<label for="en">Organization name</label><input id="en" required>
+<label for="ed">Work description</label><textarea id="ed"></textarea>
+<label for="el">Change logo</label><input id="el" type="file" accept="image/*">
+<label style="display:flex;gap:8px;align-items:center"><input id="er" type="checkbox" style="width:auto"> Remove current logo</label>
+<div class="rw" style="margin-top:18px"><button type="button" class="btn" id="ec" style="flex:1">Cancel</button><button class="btn p" style="flex:1">Save</button></div></form></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import{$,esc,toast,guard,shell,hero,ready,toEmail,errMsg,CFG,auth,db}from"/assets/core.js";
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getAuth,createUserWithEmailAndPassword,signOut,sendPasswordResetEmail}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{collection,doc,getDocs,setDoc,updateDoc,deleteDoc,query,where}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const me=await guard("OPERATOR");
+shell(me,[["dash","🏠","Dashboard","/operator/dashboard"],["profile","👤","Profile","/operator/profile"]],"dash");hero(me);
+const auth2=getAuth(initializeApp(CFG,"second")); // secondary app: creating accounts won't sign the operator out
+let L=[],editId=null,editLogo;
+
+const CH="abcdefghjkmnpqrstuvwxyzACDEFGHJKLMNPQRSTUVWXYZ23456789",gen=()=>Array.from(crypto.getRandomValues(new Uint8Array(12)),b=>CH[b%CH.length]).join("")+"!";
+const logoData=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const s=Math.min(1,256/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=Math.round(i.width*s);c.height=Math.round(i.height*s);c.getContext("2d").drawImage(i,0,0,c.width,c.height);ok(c.toDataURL("image/webp",.85))};i.onerror=()=>no(new Error("That file isn’t a valid image."));i.src=r.result};r.readAsDataURL(f)});
+const av=x=>x.logoUrl?`<img class="av" src="${esc(x.logoUrl)}" alt="">`:`<div class="av">${esc((x.name||"?")[0].toUpperCase())}</div>`;
+const fd=t=>t?new Date(t).toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"}):"-";
+
+async function load(){try{L=(await getDocs(query(collection(db,"users"),where("role","==","MANAGEMENT")))).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))}catch(x){toast(errMsg(x))}draw()}
+function draw(){const k=$("#q").value.toLowerCase(),v=L.filter(x=>(x.name+x.email).toLowerCase().includes(k));
+$("#stats").innerHTML=[["Management accounts",L.length],["Added in last 30 days",L.filter(x=>Date.now()-(x.createdAt||0)<2592e6).length],["Latest account",L[0]?.name||"-"]].map(([l,n],i)=>`<div class="st" style="animation-delay:${i*70}ms"><b>${esc(n)}</b><span>${l}</span></div>`).join("");
+$("#list").innerHTML=v.map(x=>`<div class="it"><div class="in">${av(x)}<div class="tx"><b>${esc(x.name)}</b><small>${esc(x.email)}</small><small>${esc(x.desc||"No description")} · since ${fd(x.createdAt)}</small></div></div><div class="ac"><button class="btn s" data-a="edit" data-id="${x.id}">Edit</button><button class="btn s" data-a="reset" data-id="${x.id}">Reset password</button><button class="btn s x" data-a="del" data-id="${x.id}">Delete</button></div></div>`).join("")||`<p class="em">${L.length?"No match.":"No management accounts yet. Create the first one on the left."}</p>`}
+$("#q").oninput=draw;$("#gen").onclick=()=>$("#p").value=gen();$("#p").value=gen();
+
+// create
+$("#cf").onsubmit=async e=>{e.preventDefault();const name=$("#n").value.trim(),raw=$("#e").value.trim(),pw=$("#p").value,f=$("#l").files[0];
+if(!name||!raw)return toast("Organization name and username/email are required.");if(pw.length<8)return toast("Password must be at least 8 characters.");
+$("#cb").disabled=true;
+try{const logo=f?await logoData(f):"",c=await createUserWithEmailAndPassword(auth2,toEmail(raw),pw);await signOut(auth2);
+await setDoc(doc(db,"users",c.user.uid),{uid:c.user.uid,email:toEmail(raw),role:"MANAGEMENT",name,desc:$("#d").value.trim(),logoUrl:logo,classIds:[],createdBy:me.uid,createdAt:Date.now()});
+const txt=`Login: ${raw}\nPassword: ${pw}\nURL: ${location.origin}/login`;
+$("#cred").innerHTML=`<b>Account created. Hand these credentials to the organization:</b><pre class="mono" style="margin:8px 0;white-space:pre-wrap;font-size:.85rem">${esc(txt)}</pre><button class="btn s" id="cp">Copy credentials</button>`;$("#cred").classList.add("show");
+$("#cp").onclick=()=>navigator.clipboard.writeText(txt).then(()=>toast("Credentials copied."));
+$("#cf").reset();$("#p").value=gen();toast("Management account created.");await load()}
+catch(x){toast(errMsg(x))}finally{$("#cb").disabled=false}};
+
+// list actions
+$("#list").onclick=async e=>{const b=e.target.closest("button");if(!b)return;const x=L.find(u=>u.id==b.dataset.id);if(!x)return;
+if(b.dataset.a=="edit"){editId=x.id;editLogo=undefined;$("#ee").value=x.email;$("#en").value=x.name;$("#ed").value=x.desc||"";$("#el").value="";$("#er").checked=false;$("#mo").classList.add("show")}
+if(b.dataset.a=="reset"){try{await sendPasswordResetEmail(auth,x.email);toast("Reset link sent to "+x.email)}catch(z){toast(errMsg(z))}}
+if(b.dataset.a=="del"&&confirm(`Delete "${x.name}"?\n\nThis removes its profile so it can no longer use CBTNow. To also remove the login itself, delete the user in Firebase Console > Authentication.`)){
+try{await deleteDoc(doc(db,"users",x.id));toast("Account deleted.");await load()}catch(z){toast(errMsg(z))}}};
+
+// edit
+$("#ec").onclick=()=>$("#mo").classList.remove("show");
+$("#ef").onsubmit=async e=>{e.preventDefault();const name=$("#en").value.trim();if(!name)return toast("Name is required.");
+try{const d={name,desc:$("#ed").value.trim()},f=$("#el").files[0];if(f)d.logoUrl=await logoData(f);else if($("#er").checked)d.logoUrl="";
+await updateDoc(doc(db,"users",editId),d);$("#mo").classList.remove("show");toast("Changes saved.");await load()}catch(x){toast(errMsg(x))}};
+
+await load();ready();
+</script></body></html>
