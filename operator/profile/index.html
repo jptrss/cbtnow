@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Profile · Operator · CBTNow</title><meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2724%27 fill=%27%236366f1%27/><path d=%27M28 52l16 16 30-34%27 stroke=%27white%27 stroke-width=%2712%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="/assets/theme.css"></head>
+<body><div class="bgfx"></div><div class="load" id="load"><i></i></div>
+<div class="app"><aside id="side"></aside><main>
+<section class="hero"><div><h1>Your profile</h1><p>Manage your operator account.</p></div><div class="clk"><div class="big mono" id="ck"></div><small id="dtx"></small></div></section>
+<div class="cols" style="margin-top:18px;grid-template-columns:1fr 1fr">
+<div class="card"><h3>Account information</h3>
+<form id="pf" novalidate><label>Email</label><input id="em" disabled><label for="nm">Display name</label><input id="nm" required><button class="btn p w">Save changes</button></form></div>
+<div class="card"><h3>Change password</h3>
+<form id="pw" novalidate><label for="o">Current password</label><input id="o" type="password" autocomplete="current-password" required>
+<label for="n1">New password (min. 8 characters)</label><input id="n1" type="password" autocomplete="new-password" required>
+<label for="n2">Confirm new password</label><input id="n2" type="password" autocomplete="new-password" required><button class="btn p w">Update password</button></form></div>
+</div></main></div><div class="toast" id="toast"></div>
+<script type="module">
+import{$,toast,guard,shell,ready,errMsg,auth,db}from"/assets/core.js";
+import{EmailAuthProvider,reauthenticateWithCredential,updatePassword}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const me=await guard("OPERATOR");
+shell(me,[["dash","🏠","Dashboard","/operator/dashboard"],["profile","👤","Profile","/operator/profile"]],"profile");
+const tick=()=>{const n=new Date();$("#ck").textContent=n.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});$("#dtx").textContent=n.toLocaleDateString("en",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};tick();setInterval(tick,1000);
+$("#em").value=me.email;$("#nm").value=me.name;
+$("#pf").onsubmit=async e=>{e.preventDefault();const n=$("#nm").value.trim();if(!n)return toast("Name can’t be empty.");
+try{await updateDoc(doc(db,"users",me.uid),{name:n});me.name=n;shell(me,[["dash","🏠","Dashboard","/operator/dashboard"],["profile","👤","Profile","/operator/profile"]],"profile");toast("Profile updated.")}catch(x){toast(errMsg(x))}};
+$("#pw").onsubmit=async e=>{e.preventDefault();const o=$("#o").value,a=$("#n1").value,b=$("#n2").value;
+if(a.length<8)return toast("New password must be at least 8 characters.");if(a!==b)return toast("The new passwords don’t match.");if(a===o)return toast("Choose a different password.");
+try{await reauthenticateWithCredential(auth.currentUser,EmailAuthProvider.credential(me.email,o));await updatePassword(auth.currentUser,a);e.target.reset();toast("Password updated.")}catch(x){toast(errMsg(x))}};
+ready();
+</script></body></html>
