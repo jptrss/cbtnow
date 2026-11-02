@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard · Management · CBTNow</title><meta name="robots" content="noindex">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("cbtnow-theme")||"dark"}catch{}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2724%27 fill=%27%236366f1%27/><path d=%27M28 52l16 16 30-34%27 stroke=%27white%27 stroke-width=%2712%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="/assets/theme.css"></head>
+<body><div class="bgfx"></div><div class="load" id="load"><i></i></div>
+<div class="app"><aside id="side"></aside><main>
+<section class="hero"><div><h1 id="gr"></h1><p>Management · Test &amp; content director</p><div class="nx" id="nx"></div></div><div class="clk"><div class="big mono" id="ck"></div><small id="dtx"></small></div></section>
+<div class="stats" id="stats"></div>
+<div class="cols c2">
+<div><div class="card"><div class="ch"><button id="pv" aria-label="Previous month">‹</button><b id="mt"></b><button id="nt" aria-label="Next month">›</button></div><div class="cg" id="cg"></div>
+<p class="em" style="padding:12px 0 0;font-size:.8rem">Synced with your exam sessions. <span style="color:var(--g)">●</span> live &nbsp;<span style="color:var(--ac)">●</span> upcoming &nbsp;<span style="color:var(--mu)">●</span> finished</p></div>
+<div class="card"><h3 id="dh"></h3><div id="dl"></div></div></div>
+<div><div class="card"><h3>Work summary</h3><div id="wk"></div></div>
+<div class="card"><h3>Needs your attention</h3><div id="at"></div></div>
+<div class="card"><h3>Recent activity</h3><div id="ac"></div></div></div>
+</div></main></div><div class="toast" id="toast"></div>
+<script type="module">
+import{$,esc,toast,guard,shell,hero,ready,errMsg,db,NAV}from"/assets/core.js";
+import{collection,getDocs,query,where}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const me=await guard("MANAGEMENT");me.greetName=me.name;
+shell(me,NAV.MANAGEMENT,"dash");hero(me);
+
+const w=where("createdBy","==",me.uid),get=async(c,...x)=>(await getDocs(query(collection(db,c),...x))).docs.map(d=>({id:d.id,...d.data()}));
+let U=[],C=[],P=[],E=[],S=[],B=[];
+async function load(){try{[U,C,P,E,S]=await Promise.all(["users","classes","question_packages","events","exam_sessions"].map(c=>get(c,w)));
+S.sort((a,b)=>a.startTime-b.startTime);const ids=S.map(s=>s.id).slice(0,30); // Firestore "in" allows 30 values
+B=ids.length?await get("exam_submissions",where("sessionId","in",ids)):[]}catch(x){toast(errMsg(x))}}
+
+const kd=d=>`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`,hm=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+const stt=s=>{const n=Date.now();return n<s.startTime?"Upcoming":n>s.endTime?"Past":"Live"};
+const fmt=ms=>{const s=Math.max(0,Math.floor(ms/1e3)),d=Math.floor(s/86400);return(d?d+"d ":"")+[Math.floor(s%86400/3600),Math.floor(s/60)%60,s%60].map(n=>String(n).padStart(2,"0")).join(":")};
+const ago=t=>{const m=Math.round((Date.now()-t)/6e4);return m<1?"just now":m<60?m+" min ago":m<1440?Math.round(m/60)+" h ago":Math.round(m/1440)+" d ago"};
+let cy,cm,sel;{const t=new Date();cy=t.getFullYear();cm=t.getMonth();sel=kd(t)}
+const EM=()=>Object.fromEntries(E.map(e=>[e.id,e.title]));
+const row=s=>{const x=stt(s);return`<div class="it"><div class="tx"><b>${esc(s.title)}</b><small>${esc(EM()[s.eventId]||"No event")} · ${hm(s.startTime)}–${hm(s.endTime)} · ${s.durationMinutes} min</small><small>${(s.assignedParticipantUids||[]).length} participants · ${(s.assignedProctorUids||[]).length} proctors</small></div><span class="tag ${x=="Live"?"g":x=="Upcoming"?"a":""}">${x}</span></div>`};
+function cal(){const f=new Date(cy,cm,1),days=new Date(cy,cm+1,0).getDate(),off=(f.getDay()+6)%7,by={};S.forEach(s=>(by[kd(new Date(s.startTime))]??=[]).push(s));
+let h="Mon Tue Wed Thu Fri Sat Sun".split(" ").map(d=>`<small>${d}</small>`).join("")+"<i></i>".repeat(off);
+for(let d=1;d<=days;d++){const k=`${cy}-${cm}-${d}`;h+=`<button class="d ${k==kd(new Date())?"t":""} ${k==sel?"s":""}" data-k="${k}">${d}<span>${(by[k]||[]).slice(0,3).map(s=>`<em style="background:${{Live:"var(--g)",Upcoming:"var(--ac)",Past:"var(--mu)"}[stt(s)]}"></em>`).join("")}</span></button>`}
+$("#cg").innerHTML=h;$("#mt").textContent=f.toLocaleString("en",{month:"long",year:"numeric"});
+const[y,m,d]=sel.split("-").map(Number);$("#dh").textContent=new Date(y,m,d).toLocaleDateString("en",{weekday:"long",day:"numeric",month:"long"});
+$("#dl").innerHTML=(by[sel]||[]).map(row).join("")||'<p class="em">No sessions on this day.</p>'}
+const mv=n=>{cm+=n;if(cm<0){cm=11;cy--}if(cm>11){cm=0;cy++}cal()};
+$("#pv").onclick=()=>mv(-1);$("#nt").onclick=()=>mv(1);$("#cg").onclick=e=>{const b=e.target.closest(".d");if(b){sel=b.dataset.k;cal()}};
+
+const bar=(l,a,b)=>`<div style="margin:14px 0"><div style="display:flex;justify-content:space-between;font-size:.86rem"><span>${l}</span><b>${a} / ${b}</b></div><div class="pb"><i style="width:${b?Math.round(a/b*100):0}%"></i></div></div>`;
+function paint(){const R=k=>U.filter(u=>u.role==k).length,live=S.filter(s=>stt(s)=="Live").length,up=S.filter(s=>stt(s)=="Upcoming").length,done=S.filter(s=>stt(s)=="Past").length,pub=P.filter(p=>p.status=="published").length;
+$("#stats").innerHTML=[["Live now",live],["Upcoming sessions",up],["Exam events",E.length],["Question packages",P.length],["Participants",R("PARTICIPANT")],["Proctors",R("PROCTOR")],["Problem setters",R("PROBLEM_SETTER")],["Classes",C.length]].map(([l,n],i)=>`<div class="st" style="animation-delay:${i*60}ms"><b>${n}</b><span>${l}</span></div>`).join("");
+const grouped=new Set(C.flatMap(c=>c.studentUids||[])),parts=U.filter(u=>u.role=="PARTICIPANT");
+$("#wk").innerHTML=bar("Packages published",pub,P.length)+bar("Sessions completed",done,S.length)+bar("Participants placed in a class",parts.filter(u=>grouped.has(u.uid)).length,parts.length);
+const open=S.filter(s=>stt(s)!="Past"),pm=Object.fromEntries(P.map(p=>[p.id,p])),A=[];
+const d1=P.filter(p=>p.status!="published").length,d2=open.filter(s=>!(s.assignedProctorUids||[]).length).length,d3=open.filter(s=>!(s.assignedParticipantUids||[]).length).length,d4=open.filter(s=>pm[s.packageId]&&pm[s.packageId].status!="published").length,d5=parts.filter(u=>!grouped.has(u.uid)).length;
+if(d1)A.push(`${d1} question package(s) still in draft`);if(d2)A.push(`${d2} upcoming/live session(s) have no proctor`);if(d3)A.push(`${d3} upcoming/live session(s) have no participants`);if(d4)A.push(`${d4} upcoming/live session(s) use a draft package`);if(d5)A.push(`${d5} participant(s) are not in any class`);
+$("#at").innerHTML=A.map(t=>`<div class="fd"><span>⚠️</span>${esc(t)}</div>`).join("")||'<p class="em">All set. Nothing needs your attention.</p>';
+const st=Object.fromEntries(S.map(s=>[s.id,s.title])),ev=[];
+B.forEach(b=>{const t=st[b.sessionId]||"a session",n=b.participantName||"A participant";ev.push({t:b.startedAt,x:`${n} started ${t}`});if(b.status=="submitted")ev.push({t:b.finishedAt,x:`${n} submitted ${t} · score ${b.score}`});(b.violationLogs||[]).forEach(v=>ev.push({t:v.at,w:1,x:`${n}: ${v.type} (${t})`}))});
+ev.sort((a,b)=>b.t-a.t);$("#ac").innerHTML=ev.slice(0,8).map(e=>`<div class="fd ${e.w?"w":""}"><span>${esc(e.x)}</span><small>${ago(e.t)}</small></div>`).join("")||'<p class="em">No exam activity yet.</p>';
+cal()}
+// "Next session" chip in the hero
+setInterval(()=>{const n=S.find(s=>stt(s)!="Past"),b=$("#nx");if(!n){b.classList.remove("show");return}b.classList.add("show");const l=stt(n)=="Live";
+b.innerHTML=`<span>⏱</span><span><b>${l?"Live now":"Next"}:</b> ${esc(n.title)} <span class="mono" style="color:var(--ac)">${l?"ends in ":"starts in "}${fmt((l?n.endTime:n.startTime)-Date.now())}</span></span>`},1000);
+await load();paint();ready();
+</script></body></html>
