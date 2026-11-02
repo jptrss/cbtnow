@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Profile · Management · CBTNow</title><meta name="robots" content="noindex">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("cbtnow-theme")||"dark"}catch{}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2724%27 fill=%27%236366f1%27/><path d=%27M28 52l16 16 30-34%27 stroke=%27white%27 stroke-width=%2712%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="/assets/theme.css"></head>
+<body><div class="bgfx"></div><div class="load" id="load"><i></i></div>
+<div class="app"><aside id="side"></aside><main>
+<section class="hero"><div><h1>Organization profile</h1><p>Your information, security and appearance.</p></div><div class="clk"><div class="big mono" id="ck"></div><small id="dtx"></small></div></section>
+<div class="cols c2" style="margin-top:18px">
+<div><div class="card"><h3>Organization information</h3>
+<form id="pf" novalidate><div class="pv"><div id="pa"></div><div style="flex:1"><label for="lg" style="margin-top:0">Logo</label><input id="lg" type="file" accept="image/*"></div></div>
+<label style="display:flex;gap:8px;align-items:center"><input id="rm" type="checkbox" style="width:auto"> Remove current logo</label>
+<label for="em">Login email</label><input id="em" disabled>
+<label for="nm">Organization name</label><input id="nm" required>
+<label for="ds">Work description</label><textarea id="ds"></textarea>
+<button class="btn p w" id="sb">Save changes</button></form></div></div>
+<div><div class="card"><h3>Appearance</h3><p class="em" style="padding-top:0">Choose how CBTNow looks on this device. You can also use the sun/moon button in the sidebar.</p>
+<div class="seg"><button class="btn" id="md">🌙 Dark</button><button class="btn" id="ml">☀️ Light</button></div></div>
+<div class="card"><h3>Change password</h3>
+<form id="pw" novalidate><label for="o">Current password</label><input id="o" type="password" autocomplete="current-password" required>
+<label for="n1">New password (min. 8 characters)</label><input id="n1" type="password" autocomplete="new-password" required>
+<label for="n2">Confirm new password</label><input id="n2" type="password" autocomplete="new-password" required><button class="btn p w">Update password</button></form></div></div>
+</div></main></div><div class="toast" id="toast"></div>
+<script type="module">
+import{$,esc,toast,guard,shell,hero,ready,errMsg,auth,db,NAV,setTheme,logoData}from"/assets/core.js";
+import{EmailAuthProvider,reauthenticateWithCredential,updatePassword}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const me=await guard("MANAGEMENT");shell(me,NAV.MANAGEMENT,"profile");hero(me);
+const av=()=>$("#pa").innerHTML=me.logoUrl?`<img class="av" style="width:64px;height:64px" src="${esc(me.logoUrl)}" alt="">`:`<div class="av" style="width:64px;height:64px;font-size:1.6rem">${esc((me.name||"?")[0].toUpperCase())}</div>`;
+av();$("#em").value=me.email;$("#nm").value=me.name;$("#ds").value=me.desc||"";
+
+$("#pf").onsubmit=async e=>{e.preventDefault();const name=$("#nm").value.trim();if(!name)return toast("Organization name can’t be empty.");
+$("#sb").disabled=true;
+try{const d={name,desc:$("#ds").value.trim()},f=$("#lg").files[0];if(f)d.logoUrl=await logoData(f);else if($("#rm").checked)d.logoUrl="";
+await updateDoc(doc(db,"users",me.uid),d);Object.assign(me,d);$("#lg").value="";$("#rm").checked=false;av();shell(me,NAV.MANAGEMENT,"profile");toast("Profile updated.")}
+catch(x){toast(errMsg(x))}finally{$("#sb").disabled=false}};
+
+$("#md").onclick=()=>setTheme("dark");$("#ml").onclick=()=>setTheme("light");
+
+$("#pw").onsubmit=async e=>{e.preventDefault();const o=$("#o").value,a=$("#n1").value,b=$("#n2").value;
+if(a.length<8)return toast("New password must be at least 8 characters.");if(a!==b)return toast("The new passwords don’t match.");if(a===o)return toast("Choose a different password.");
+try{await reauthenticateWithCredential(auth.currentUser,EmailAuthProvider.credential(me.email,o));await updatePassword(auth.currentUser,a);e.target.reset();toast("Password updated.")}catch(x){toast(errMsg(x))}};
+ready();
+</script></body></html>
