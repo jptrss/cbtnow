@@ -29,13 +29,23 @@ res({uid:u.uid,...d})}))}
 
 // Sidebar: nav = [[key, icon, label, href], ...]
 export function shell(me,nav,active){const R=ROLES[me.role];document.documentElement.style.setProperty("--ac",R.ac);
-$("#side").innerHTML=`<a class="logo" href="${ROUTES[me.role]}"><div class="mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l5 5 9-10"/></svg></div>CBT<span>Now</span></a>
-<nav class="nv">${nav.map(([k,i,l,h])=>`<a href="${h}" class="${k==active?"on":""}"><span>${i}</span>${l}</a>`).join("")}</nav>
+$("#side").innerHTML=`<div class="lr"><a class="logo" href="${ROUTES[me.role]}"><div class="mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l5 5 9-10"/></svg></div>CBT<span>Now</span></a><button class="th" id="th" aria-label="Switch between dark and light mode"></button></div>
+<nav class="nv">${nav.map(([k,i,l,h])=>`<a ${h?`href="${h}"`:"data-soon"} class="${k==active?"on":""}"><span>${i}</span>${l}</a>`).join("")}</nav>
 <div class="me"><b>${esc(me.name)}</b><small>${esc(me.email)}</small><span class="chip">${R.label}</span><button class="btn s" id="so" style="width:100%">Sign out</button></div>`;
-$("#so").onclick=async()=>{await signOut(auth);location.replace("/login")}}
+$("#so").onclick=async()=>{await signOut(auth);location.replace("/login")};$("#th").onclick=()=>setTheme(document.documentElement.dataset.theme=="dark"?"light":"dark");setTheme(document.documentElement.dataset.theme);document.querySelectorAll("[data-soon]").forEach(a=>a.onclick=()=>toast("This page is coming in the next step."))}
 
 // Greeting + live clock in the hero card (#gr, #ck, #dtx)
-export function hero(me){const t=()=>{const n=new Date();$("#gr").textContent=`${greet()}, ${me.name.split(" ")[0]}`;
+export function hero(me){const t=()=>{const n=new Date();if($("#gr"))$("#gr").textContent=`${greet()}, ${me.greetName||me.name.split(" ")[0]}`;
 $("#ck").textContent=n.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
 $("#dtx").textContent=n.toLocaleDateString("en",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};t();setInterval(t,1000)}
 export const ready=()=>$("#load").classList.add("h");
+
+// ---- Light / dark mode (saved in this browser) ----
+export const setTheme=t=>{document.documentElement.dataset.theme=t;try{localStorage.setItem("cbtnow-theme",t)}catch{}const b=$("#th");if(b)b.textContent=t=="dark"?"☀️":"🌙"};
+let _t="dark";try{_t=localStorage.getItem("cbtnow-theme")||"dark"}catch{}setTheme(_t);
+
+// ---- Resize an image file to max 256px and return a data URL (stored in Firestore, no Storage needed) ----
+export const logoData=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const s=Math.min(1,256/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=Math.round(i.width*s);c.height=Math.round(i.height*s);c.getContext("2d").drawImage(i,0,0,c.width,c.height);ok(c.toDataURL("image/webp",.85))};i.onerror=()=>no(new Error("That file isn't a valid image."));i.src=r.result};r.readAsDataURL(f)});
+
+// ---- Sidebar menus per role. Set href to null for pages not built yet (shows "coming soon"). ----
+export const NAV={MANAGEMENT:[["dash","🏠","Dashboard","/management/dashboard"],["accounts","👥","Accounts",null],["question","📚","Questions",null],["exam","🗓","Exams",null],["profile","👤","Profile","/management/profile"]]};
