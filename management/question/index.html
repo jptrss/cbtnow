@@ -1,0 +1,173 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Questions · Management · CBTNow</title><meta name="robots" content="noindex">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("cbtnow-theme")||"dark"}catch{}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2724%27 fill=%27%236366f1%27/><path d=%27M28 52l16 16 30-34%27 stroke=%27white%27 stroke-width=%2712%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="/assets/theme.css">
+<style>
+select{width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.28);color:var(--tx);font:inherit;outline:0}[data-theme=light] select{background:#fff}
+select option{background:#0b1030;color:#e8ebff}[data-theme=light] select option{background:#fff;color:#0f172a}
+input[type=checkbox],input[type=radio]{width:auto;padding:0;margin:0;accent-color:var(--ac)}
+.btn.on{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 20%,transparent)}
+.ck{display:flex;flex-wrap:wrap;gap:6px}.ck label{margin:0;padding:5px 12px;border:1px solid var(--line);border-radius:99px;cursor:pointer;display:flex;gap:6px;align-items:center;color:var(--tx);font-size:.82rem}
+.chp{display:inline-block;padding:1px 9px;border-radius:99px;font-size:.74rem;border:1px solid var(--line);margin:0 4px 3px 0;color:var(--mu)}
+.fl{display:grid;grid-template-columns:1fr 170px 200px auto;gap:8px;margin-bottom:16px}@media(max-width:900px){.fl{grid-template-columns:1fr 1fr}}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}.pk{margin:0;display:flex;flex-direction:column;gap:10px}.pk h3{margin:0}.mt{color:var(--mu);font-size:.85rem}
+.ed{grid-template-columns:minmax(0,1fr) 330px}@media(max-width:1100px){.ed{grid-template-columns:1fr}}
+.eb{position:sticky;top:0;z-index:5;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:rgba(6,9,24,.88);backdrop-filter:blur(12px);margin-bottom:14px}
+[data-theme=light] .eb{background:rgba(255,255,255,.9)}.eb .tt{flex:1;min-width:200px;font:700 1.1rem "Space Grotesk"}
+.side{position:sticky;top:84px;align-self:start}@media(max-width:1100px){.side{position:static}}
+.qh{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.qh select{width:auto}.qh input{width:84px}.sp{flex:1}
+.tb{display:flex;gap:4px;flex-wrap:wrap;padding:6px;border:1px solid var(--line);border-bottom:0;border-radius:12px 12px 0 0;background:rgba(255,255,255,.04)}
+.tb button,.tb select{padding:4px 9px;font-size:.8rem;border-radius:8px;border:1px solid var(--line);background:none;color:var(--tx);cursor:pointer;width:auto}.tb button:hover{border-color:var(--ac)}
+.rte{min-height:110px;padding:12px 14px;border:1px solid var(--line);border-radius:0 0 12px 12px;background:rgba(0,0,0,.2);outline:0;line-height:1.7;overflow-wrap:anywhere}.rte:focus{border-color:var(--ac)}
+[data-theme=light] .rte{background:#fff}.rte img{max-width:100%;border-radius:8px;cursor:pointer;vertical-align:middle}.rte img.on{outline:3px solid var(--ac)}
+.lp{margin-top:8px;padding:10px 14px;border-radius:12px;border:1px dashed var(--line);font-size:.92rem;display:none}.lp.show{display:block}
+.opr{display:flex;gap:8px;align-items:center;margin:6px 0}.opr>b{width:20px;color:var(--mu)}.opr input[type=text]{flex:1;min-width:0}.opr img{height:34px;border-radius:6px}
+.iss{border-color:var(--r)!important}
+.nav{display:flex;flex-wrap:wrap;gap:5px}.nav button{width:34px;height:34px;padding:0;border-radius:8px;border:1px solid var(--line);background:none;color:var(--tx);cursor:pointer;font-size:.8rem}.nav .ok{background:var(--g);color:#04210f;border:0}.nav .bd{background:var(--r);color:#fff;border:0}
+.mo .card.wd{width:min(860px,100%)}.pr{max-height:70vh;overflow:auto}.ok{color:var(--g)}
+</style></head>
+<body><div class="bgfx"></div><div class="load" id="load"><i></i></div>
+<div class="app"><aside id="side"></aside><main>
+<section class="hero" id="hero"><div><h1>Question packages</h1><p>Create, edit and assign question packages to problem setters.</p></div><div class="clk"><div class="big mono" id="ck"></div><small id="dtx"></small></div></section>
+<div class="stats" id="stats"></div>
+<div id="lv"><div class="fl"><input id="fq" placeholder="Search packages…"><select id="fs"><option value="">All statuses</option><option value="draft">Draft</option><option value="published">Published</option></select><select id="fu"></select><button class="btn p" id="np">＋ New package</button></div><div class="pg" id="pg"></div></div>
+<div id="ev" style="display:none"></div>
+</main></div><div class="mo" id="mo"></div><div class="toast" id="toast"></div>
+
+<script type="module">
+import{$,esc,toast,guard,shell,hero,ready,errMsg,db,NAV}from"/assets/core.js";
+import{collection,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,query,where}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const me=await guard("MANAGEMENT");shell(me,NAV.MANAGEMENT,"question");hero(me);
+
+// ---------- constants & helpers ----------
+const TL={mcq:"Multiple choice",complex:"Complex multiple choice",short:"Short answer"},LET="ABCDEFGHIJ";
+const SNIP=[["Fraction","$\\frac{a}{b}$"],["Square root","$\\sqrt{x}$"],["nth root","$\\sqrt[n]{x}$"],["Power","$x^{2}$"],["Subscript","$x_{i}$"],["Sum","$\\sum_{i=1}^{n} x_i$"],["Integral","$\\int_{a}^{b} f(x)\\,dx$"],["Limit","$\\lim_{x\\to 0}$"],["Greek α β π θ","$\\alpha\\ \\beta\\ \\pi\\ \\theta$"],["≤ ≥ ≠ ≈ ±","$\\le\\ \\ge\\ \\ne\\ \\approx\\ \\pm$"],["Vector","$\\vec{v}$"],["Matrix","$\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix}$"],["Display block","$$ E=mc^2 $$"]];
+const gid=()=>Math.random().toString(36).slice(2,9);
+const ago=t=>{const m=Math.round((Date.now()-(t||0))/6e4);return m<1?"just now":m<60?m+" min ago":m<1440?Math.round(m/60)+" h ago":Math.round(m/1440)+" d ago"};
+const renderMath=el=>window.renderMathInElement&&renderMathInElement(el,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false},{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false});
+const clean=h=>{const r=new DOMParser().parseFromString(`<div>${h||""}</div>`,"text/html").body.firstChild;r.querySelectorAll("script,style,iframe,object,embed,link,meta,form").forEach(e=>e.remove());
+r.querySelectorAll("*").forEach(e=>[...e.attributes].forEach(a=>{const n=a.name.toLowerCase(),v=a.value.trim().toLowerCase();if(n.startsWith("on")||(["href","src"].includes(n)&&/^(javascript|data:text|vbscript)/.test(v)))e.removeAttribute(a.name)}));return r.innerHTML};
+const imgData=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const s=Math.min(1,900/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=Math.round(i.width*s);c.height=Math.round(i.height*s);c.getContext("2d").drawImage(i,0,0,c.width,c.height);ok(c.toDataURL("image/webp",.75))};i.onerror=()=>no(new Error("That file isn’t a valid image."));i.src=r.result};r.readAsDataURL(f)});
+const pick=cb=>{const i=document.createElement("input");i.type="file";i.accept="image/*";i.onchange=async()=>{const f=i.files[0];if(!f)return;try{const d=await imgData(f);if(d.length>3e5)toast("Large image ("+Math.round(d.length/1024)+" KB). Smaller images keep the package under Firestore’s 1 MB limit.");cb(d)}catch(x){toast(x.message)}};i.click()};
+const mo=(h,w)=>{$("#mo").innerHTML=`<div class="card ${w?"wd":""}">${h}</div>`;$("#mo").classList.add("show")},cmo=()=>$("#mo").classList.remove("show");
+const norm=p=>({description:"",durationMinutes:60,assignedSetterUids:[],status:"draft",shuffleQuestions:false,shuffleOptions:false,...p,questions:(p.questions||[]).map(q=>q.type=="short"?{answers:[],mode:"text",tol:0,...q}:{options:[],correct:[],scoring:"all",...q})});
+const mk=t=>({id:gid(),type:t,text:"",score:1,...(t=="short"?{answers:[""],mode:"text",tol:0}:{options:Array.from({length:4},()=>({t:"",img:""})),correct:[],scoring:"all"})});
+const cq=q=>{const o={id:q.id,type:q.type,text:clean((q.text||"").replace(/ class="on"/g,"")),score:+q.score||0};
+if(q.type=="short"){o.answers=(q.answers||[]).map(x=>x.trim()).filter(Boolean);o.mode=q.mode||"text";o.tol=+q.tol||0}
+else{o.options=q.options.map(x=>({t:x.t.trim(),img:x.img||""}));o.correct=[...q.correct].sort((a,b)=>a-b);if(q.type=="complex")o.scoring=q.scoring||"all"}return o};
+const iss=q=>{const e=[],d=document.createElement("div");d.innerHTML=q.text||"";if(!d.textContent.trim()&&!d.querySelector("img"))e.push("Question text is empty");
+if(q.type=="short"){const a=(q.answers||[]).filter(x=>x.trim());if(!a.length)e.push("Add at least one accepted answer");else if(q.mode=="number"&&a.some(x=>isNaN(+x.trim().replace(",","."))))e.push("Answers must be numbers")}
+else{if(q.options.length<3)e.push("At least 3 options");if(q.options.some(o=>!o.t.trim()&&!o.img))e.push("Some options are empty");if(!q.correct.length)e.push("Mark the correct answer");if(q.type=="mcq"&&q.correct.length>1)e.push("Only one correct answer")}
+if(!(+q.score>0))e.push("Score must be above 0");return e};
+const pubIssues=p=>!p.questions.length?["The package has no questions."]:p.questions.flatMap((q,i)=>iss(q).map(m=>`Q${i+1}: ${m}`));
+const total=p=>(p.questions||[]).reduce((a,q)=>a+(+q.score||0),0);
+
+// ---------- data ----------
+let P=[],SU=[],cur=null,base=0,dirtyF=false,tm,SEL=null,selImg=null,RMT=null,PV=null;const F={q:"",s:"",u:""};
+const nm=u=>u==me.uid?"Me":(SU.find(s=>s.id==u)?.name||"Unknown");
+const ALLSU=()=>[{id:me.uid,name:"Me (Management)"},...SU];
+async function loadAll(){try{const w=where("createdBy","==",me.uid),r=await Promise.all([getDocs(query(collection(db,"question_packages"),w)),getDocs(query(collection(db,"users"),where("role","==","PROBLEM_SETTER"),w))]);
+P=r[0].docs.map(d=>norm({id:d.id,...d.data()}));SU=r[1].docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.name.localeCompare(b.name))}catch(x){toast(errMsg(x))}}
+
+// ---------- list view ----------
+function drawList(){const qy=F.q.toLowerCase(),L=P.filter(p=>(!qy||p.title.toLowerCase().includes(qy))&&(!F.s||p.status==F.s)&&(!F.u||(F.u=="_none"?!p.assignedSetterUids.length:p.assignedSetterUids.includes(F.u)))).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+$("#stats").innerHTML=[["Packages",P.length],["Published",P.filter(p=>p.status=="published").length],["Drafts",P.filter(p=>p.status!="published").length],["Total questions",P.reduce((a,p)=>a+p.questions.length,0)]].map(([l,v],i)=>`<div class="st" style="animation-delay:${i*60}ms"><b>${v}</b><span>${l}</span></div>`).join("");
+$("#fu").innerHTML='<option value="">All problem setters</option><option value="_none"'+(F.u=="_none"?" selected":"")+'>Unassigned</option>'+ALLSU().map(s=>`<option value="${s.id}" ${F.u==s.id?"selected":""}>${esc(s.name)}</option>`).join("");
+$("#pg").innerHTML=L.map(p=>{const su=p.assignedSetterUids;return`<div class="card pk"><div style="display:flex;justify-content:space-between;gap:8px;align-items:start"><h3>${esc(p.title)}</h3><span class="tag ${p.status=="published"?"g":""}">${p.status=="published"?"Published":"Draft"}</span></div><p class="mt">${esc(p.description||"No description")}</p><div class="mt">${p.questions.length} questions · ${total(p)} pts · ${p.durationMinutes} min</div><div>${su.slice(0,3).map(u=>`<span class="chp">${esc(nm(u))}</span>`).join("")||'<span class="chp">Unassigned</span>'}${su.length>3?`<span class="chp">+${su.length-3}</span>`:""}</div><div class="mt">Updated ${ago(p.updatedAt)} by ${esc(nm(p.updatedBy))}</div><div class="rw" style="flex-wrap:wrap;margin-top:auto"><button class="btn s p" data-a="edit" data-id="${p.id}">Edit</button><button class="btn s" data-a="view" data-id="${p.id}">Preview</button><button class="btn s" data-a="dup" data-id="${p.id}">Duplicate</button><button class="btn s" data-a="pub" data-id="${p.id}">${p.status=="published"?"Unpublish":"Publish"}</button><button class="btn s x" data-a="del" data-id="${p.id}">Delete</button></div></div>`}).join("")||`<div class="card" style="grid-column:1/-1"><p class="em">${P.length?"No packages match these filters.":"No question packages yet. Create the first one with “New package”."}</p></div>`}
+$("#fq").oninput=e=>{F.q=e.target.value;drawList()};$("#fs").onchange=e=>{F.s=e.target.value;drawList()};$("#fu").onchange=e=>{F.u=e.target.value;drawList()};
+$("#np").onclick=()=>{mo(`<h3>New question package</h3><form id="nf" novalidate><label for="nt">Title</label><input id="nt" required placeholder="e.g. Mathematics Olympiad · Round 1"><label for="nd">Default duration (minutes)</label><input id="nd" type="number" min="1" value="60"><label>Assigned problem setters (optional)</label><div class="ck">${ALLSU().map(s=>`<label><input type="checkbox" value="${s.id}">${esc(s.name)}</label>`).join("")}</div><div class="rw" style="margin-top:16px"><button type="button" class="btn" data-x style="flex:1">Cancel</button><button class="btn p" style="flex:1">Create &amp; open</button></div></form>`);
+$("#nf").onsubmit=async e=>{e.preventDefault();const t=$("#nt").value.trim();if(!t)return toast("Title is required.");const id=doc(collection(db,"question_packages")).id,now=Date.now();
+try{await setDoc(doc(db,"question_packages",id),{id,title:t,description:"",durationMinutes:Math.max(1,+$("#nd").value||60),assignedSetterUids:[...document.querySelectorAll("#mo .ck input:checked")].map(i=>i.value),questions:[],status:"draft",shuffleQuestions:false,shuffleOptions:false,createdBy:me.uid,createdAt:now,updatedAt:now,updatedBy:me.uid});cmo();location.hash="#/edit/"+id}catch(x){toast(errMsg(x))}}};
+$("#pg").onclick=async e=>{const b=e.target.closest("[data-a]");if(!b)return;const p=P.find(x=>x.id==b.dataset.id),a=b.dataset.a;if(!p)return;
+if(a=="edit")location.hash="#/edit/"+p.id;if(a=="view")preview(p.questions);
+if(a=="dup"){const id=doc(collection(db,"question_packages")).id,now=Date.now();try{await setDoc(doc(db,"question_packages",id),{...structuredClone(p),id,title:p.title+" (copy)",status:"draft",createdBy:me.uid,createdAt:now,updatedAt:now,updatedBy:me.uid});toast("Package duplicated.");await loadAll();drawList()}catch(x){toast(errMsg(x))}}
+if(a=="pub"){const to=p.status=="published"?"draft":"published";if(to=="published"){const is=pubIssues(p);if(is.length)return mo(`<h3>Can’t publish yet</h3><p class="em" style="padding-top:0">Fix these first:</p>${is.slice(0,10).map(m=>`<div class="fd"><span>${esc(m)}</span></div>`).join("")}<div class="rw" style="margin-top:14px"><button class="btn" data-x style="flex:1">Close</button><button class="btn p" data-edit="${p.id}" style="flex:1">Open editor</button></div>`)}
+try{await updateDoc(doc(db,"question_packages",p.id),{status:to,updatedAt:Date.now(),updatedBy:me.uid});toast(to=="published"?"Published.":"Moved back to draft.");await loadAll();drawList()}catch(x){toast(errMsg(x))}}
+if(a=="del"){try{const u=await getDocs(query(collection(db,"exam_sessions"),where("packageId","==",p.id),where("createdBy","==",me.uid)));if(u.size)return toast(`In use by ${u.size} exam session(s). Remove those sessions first.`);
+if(!confirm(`Delete “${p.title}” and its ${p.questions.length} questions? This can’t be undone.`))return;await deleteDoc(doc(db,"question_packages",p.id));toast("Package deleted.");await loadAll();drawList()}catch(x){toast(errMsg(x))}}};
+$("#mo").onclick=async e=>{const t=e.target;if(t.id=="mo"||t.closest("[data-x]"))return cmo();const ed=t.closest("[data-edit]");if(ed){cmo();location.hash="#/edit/"+ed.dataset.edit}
+if(t.closest("[data-r=mine]")){cmo();save(true)}if(t.closest("[data-r=theirs]")){cmo();cur=norm(RMT);base=cur.updatedAt||0;dirtyF=false;drawEd()}};
+
+// ---------- preview ----------
+function preview(qs,off=0,key=false){PV={qs,off};
+mo(`<h3><span>Preview${qs.length>1?" · "+qs.length+" questions":""}</span><label style="margin:0;display:flex;gap:8px;align-items:center;font-size:.85rem"><input type="checkbox" id="pk" ${key?"checked":""}> Show answer key</label></h3><div class="pr">${qs.map((q,i)=>`<div class="card" style="margin:10px 0"><b>${off+i+1}.</b> <small style="color:var(--mu)">(${q.score} pt · ${TL[q.type]})</small><div style="margin:8px 0">${clean(q.text)}</div>${q.type=="short"?`<input disabled placeholder="Participant types the answer here">${key?`<p class="ok" style="margin-top:8px">Accepted: ${esc((q.answers||[]).join(" | "))} (${q.mode}${q.mode=="number"?" ±"+(q.tol||0):""})</p>`:""}`:q.options.map((o,k)=>`<div class="opr" style="padding:8px 10px;border:1px solid ${key&&q.correct.includes(k)?"var(--g)":"var(--line)"};border-radius:10px"><input type="${q.type=="mcq"?"radio":"checkbox"}" disabled ${key&&q.correct.includes(k)?"checked":""}><b>${LET[k]}</b><span>${esc(o.t)}${o.img?`<br><img src="${esc(o.img)}" style="height:auto;max-width:100%;max-height:200px">`:""}</span></div>`).join("")}</div>`).join("")||'<p class="em">No questions to preview.</p>'}</div><div class="rw" style="margin-top:12px"><button class="btn" data-x style="flex:1">Close</button></div>`,true);
+renderMath($("#mo"));$("#pk").onchange=e=>preview(PV.qs,PV.off,e.target.checked)}
+
+// ---------- editor ----------
+const TB=`<div class="tb"><button type="button" data-c="bold"><b>B</b></button><button type="button" data-c="italic"><i>I</i></button><button type="button" data-c="underline"><u>U</u></button><button type="button" data-c="subscript">x₂</button><button type="button" data-c="superscript">x²</button><button type="button" data-c="insertUnorderedList">• List</button><button type="button" data-c="insertOrderedList">1. List</button><button type="button" data-c="removeFormat">Clear</button><select data-sn><option value="">Σ Insert math…</option>${SNIP.map(s=>`<option value="${esc(s[1])}">${s[0]}</option>`).join("")}</select><select data-f="lay"><option value="inline">Image: inline</option><option value="block">Image: own line</option></select><select data-f="wd"><option value="">Img width</option><option>25%</option><option>50%</option><option>75%</option><option>100%</option></select><button type="button" data-c="up">🖼 Upload</button><button type="button" data-c="url">🔗 Image URL</button></div>`;
+const qCard=(q,i)=>{const sh=q.type=="short",body=sh?`<label>Accepted answers (one per line)</label><textarea data-f="ans" rows="3" placeholder="e.g. 42">${esc((q.answers||[]).join("\n"))}</textarea><div class="rw"><div style="flex:1;min-width:200px"><label>Matching</label><select data-f="mode"><option value="text" ${q.mode=="text"?"selected":""}>Text (ignore case &amp; extra spaces)</option><option value="exact" ${q.mode=="exact"?"selected":""}>Exact (case-sensitive)</option><option value="number" ${q.mode=="number"?"selected":""}>Number (with tolerance)</option></select></div>${q.mode=="number"?`<div style="width:140px"><label>Tolerance ±</label><input type="number" step="any" min="0" data-f="tol" value="${q.tol||0}"></div>`:""}</div>`
+:`<label>Options · ${q.type=="mcq"?"select the one correct answer":"tick all correct answers"}</label>${q.options.map((o,k)=>`<div class="opr" data-o="${k}"><input type="${q.type=="mcq"?"radio":"checkbox"}" name="c${i}" data-f="ok" ${q.correct.includes(k)?"checked":""}><b>${LET[k]}</b><input type="text" data-f="ot" value="${esc(o.t)}" placeholder="Option text (LaTeX ok)">${o.img?`<img src="${esc(o.img)}" alt=""><button type="button" class="btn s" data-a="oix" title="Remove image">✕</button>`:`<button type="button" class="btn s" data-a="oi" title="Add image">🖼</button>`}<button type="button" class="btn s x" data-a="or" title="Remove option">−</button></div>`).join("")}<div class="rw" style="margin-top:8px;flex-wrap:wrap"><button type="button" class="btn s" data-a="oa">＋ Add option</button><span style="color:var(--mu);font-size:.82rem">Quick set:</span>${[3,4,5].map(n=>`<button type="button" class="btn s ${q.options.length==n?"on":""}" data-a="on" data-n="${n}">${n}</button>`).join("")}${q.type=="complex"?`<span class="sp"></span><select data-f="scoring" style="width:auto" title="Partial credit = (correct picks − wrong picks) ÷ total correct, minimum 0"><option value="all" ${q.scoring!="partial"?"selected":""}>Scoring: all-or-nothing</option><option value="partial" ${q.scoring=="partial"?"selected":""}>Scoring: partial credit</option></select>`:""}</div>`;
+return`<div class="card qc" id="qc${i}" data-i="${i}"><div class="qh"><b>Question ${i+1}</b><select data-f="type">${Object.entries(TL).map(([k,v])=>`<option value="${k}" ${q.type==k?"selected":""}>${v}</option>`).join("")}</select><label style="margin:0;display:flex;gap:6px;align-items:center">Score <input type="number" min="0" step="0.5" data-f="score" value="${q.score}"></label><span class="sp"></span><button class="btn s" data-a="mvu" title="Move up">↑</button><button class="btn s" data-a="mvd" title="Move down">↓</button><button class="btn s" data-a="pv" title="Preview">👁</button><button class="btn s" data-a="dup" title="Duplicate">⧉</button><button class="btn s x" data-a="del" title="Delete">🗑</button></div>${TB}<div class="rte" contenteditable="true" data-f="text">${clean(q.text)}</div><div class="lp" id="lp${i}"></div>${body}</div>`};
+function drawEd(){$("#hero").style.display=$("#stats").style.display=$("#lv").style.display="none";$("#ev").style.display="";
+$("#ev").innerHTML=`<div class="eb"><button class="btn s" data-a="back">← Packages</button><input class="tt" id="tt" value="${esc(cur.title)}" placeholder="Package title"><select id="st" style="width:auto"><option value="draft" ${cur.status!="published"?"selected":""}>Draft</option><option value="published" ${cur.status=="published"?"selected":""}>Published</option></select><button class="btn s" data-a="pvall">👁 Preview all</button><button class="btn s p" data-a="save">Save</button><span class="tag" id="sv">Saved</span></div>
+<div class="cols ed"><div><div id="qs"></div><div class="rw" style="flex-wrap:wrap;margin-bottom:30px"><button class="btn" data-add="mcq">＋ Multiple choice</button><button class="btn" data-add="complex">＋ Complex multiple choice</button><button class="btn" data-add="short">＋ Short answer</button></div></div>
+<div class="side"><div class="card"><h3>Package settings</h3><label for="ds">Description</label><textarea id="ds" rows="2">${esc(cur.description)}</textarea><label for="du">Default duration (minutes)</label><input id="du" type="number" min="1" value="${cur.durationMinutes}"><label>Assigned problem setters</label><div class="ck">${ALLSU().map(s=>`<label><input type="checkbox" data-set="${s.id}" ${cur.assignedSetterUids.includes(s.id)?"checked":""}>${esc(s.name)}</label>`).join("")}</div>${SU.length?"":'<p class="em" style="font-size:.8rem">No problem setters yet. Create them in Accounts.</p>'}<label style="display:flex;gap:8px;align-items:center;margin-top:14px"><input type="checkbox" id="sh1" ${cur.shuffleQuestions?"checked":""}> Shuffle question order</label><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="sh2" ${cur.shuffleOptions?"checked":""}> Shuffle answer options</label></div><div class="card" id="sm"></div></div></div>`;drawQs();sm()}
+function drawQs(){$("#qs").innerHTML=cur.questions.map(qCard).join("")||'<div class="card"><p class="em">No questions yet. Add the first one below.</p></div>';cur.questions.forEach((_,i)=>lpq(i,true))}
+function sm(){const qs=cur.questions,b=new Blob([JSON.stringify(qs)]).size,pc=Math.min(100,Math.round(b/1e4)),is=qs.map(iss);
+$("#sm").innerHTML=`<h3>Summary</h3><div class="rw" style="gap:22px"><div><b style="font-size:1.4rem">${qs.length}</b><br><small style="color:var(--mu)">questions</small></div><div><b style="font-size:1.4rem">${total(cur)}</b><br><small style="color:var(--mu)">total points</small></div></div><label>Size ${Math.round(b/1024)} KB of ~1000 KB</label><div class="pb"><i style="width:${pc}%;${pc>85?"background:var(--r)":""}"></i></div><label>Navigator</label><div class="nav">${qs.map((_,i)=>`<button class="${is[i].length?"bd":"ok"}" data-nv="${i}">${i+1}</button>`).join("")||"<small style='color:var(--mu)'>No questions yet.</small>"}</div>${is.some(x=>x.length)?"<label>To fix</label>"+is.flatMap((x,i)=>x.map(m=>`<div class="fd"><span>Q${i+1}: ${esc(m)}</span></div>`)).slice(0,6).join(""):""}`;
+is.forEach((x,i)=>$("#qc"+i)?.classList.toggle("iss",!!x.length))}
+const lt={};function lpq(i,now){clearTimeout(lt[i]);const run=()=>{const q=cur?.questions[i],el=$("#lp"+i);if(!q||!el)return;if(/\$|\\\(|\\\[/.test(q.text)){el.classList.add("show");el.innerHTML="<small style='color:var(--mu)'>Math preview</small><div>"+clean(q.text.replace(/ class="on"/g,""))+"</div>";renderMath(el)}else el.classList.remove("show")};now?run():lt[i]=setTimeout(run,400)}
+const setSv=t=>{const s=$("#sv");if(s)s.textContent=t};
+const dirty=()=>{dirtyF=true;setSv("Unsaved changes…");clearTimeout(tm);tm=setTimeout(()=>save(),2000)};
+async function save(force){if(!cur)return true;clearTimeout(tm);const ref=doc(db,"question_packages",cur.id),qs=cur.questions.map(cq),size=new Blob([JSON.stringify(qs)]).size;
+if(size>1e6){toast(`Too large (${Math.round(size/1024)} KB). Remove or shrink images.`);setSv("Too large");return false}
+setSv("Saving…");try{if(!force){const r=await getDoc(ref);if(r.exists()&&(r.data().updatedAt||0)>base&&r.data().updatedBy!==me.uid){RMT={id:r.id,...r.data()};setSv("Conflict");mo(`<h3>Changed by someone else</h3><p class="em" style="padding-top:0">${esc(nm(RMT.updatedBy))} saved a newer version at ${new Date(RMT.updatedAt).toLocaleTimeString()}. Overwrite their changes with yours, or load their version?</p><div class="rw"><button class="btn" data-r="theirs" style="flex:1">Load their version</button><button class="btn p" data-r="mine" style="flex:1">Overwrite</button></div>`);return false}}
+const now=Date.now();await setDoc(ref,{...cur,questions:qs,updatedAt:now,updatedBy:me.uid});base=now;cur.updatedAt=now;cur.updatedBy=me.uid;dirtyF=false;setSv("Saved "+new Date(now).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}));return true}catch(x){setSv("Error");toast(errMsg(x));return false}}
+async function openEd(id){try{const s=await getDoc(doc(db,"question_packages",id));if(!s.exists()||s.data().createdBy!==me.uid){toast("Package not found.");location.hash="";return}
+cur=norm({id:s.id,...s.data()});base=cur.updatedAt||0;dirtyF=false;drawEd()}catch(x){toast(errMsg(x))}}
+async function showList(){if(cur&&dirtyF&&!(await save()))return;cur=null;$("#ev").style.display="none";$("#ev").innerHTML="";$("#hero").style.display=$("#stats").style.display=$("#lv").style.display="";await loadAll();drawList()}
+async function route(){const m=location.hash.match(/^#\/edit\/(.+)$/);m?await openEd(m[1]):await showList()}
+addEventListener("hashchange",route);addEventListener("beforeunload",e=>{if(dirtyF){e.preventDefault();e.returnValue=""}});
+
+// ---------- editor events ----------
+document.addEventListener("selectionchange",()=>{const s=getSelection();if(!s.rangeCount)return;const r=s.getRangeAt(0),n=r.commonAncestorContainer,rte=(n.nodeType==1?n:n.parentElement)?.closest?.(".rte");if(rte)SEL={rte,range:r.cloneRange()}});
+const restore=rte=>{rte.focus();if(SEL&&SEL.rte==rte){const s=getSelection();s.removeAllRanges();s.addRange(SEL.range)}};
+const ex=(rte,c,v)=>{restore(rte);document.execCommand(c,false,v);rte.dispatchEvent(new Event("input",{bubbles:true}))};
+const putImg=(rte,src)=>{const lay=rte.closest(".qc").querySelector("[data-f=lay]").value,im=`<img src="${esc(src)}" style="max-width:100%">`;ex(rte,"insertHTML",lay=="block"?`<div style="text-align:center">${im}</div><div><br></div>`:im)};
+const qOf=el=>{const c=el.closest(".qc");return c?+c.dataset.i:-1};
+const EV=$("#ev"),redraw=()=>{drawQs();dirty();sm()};
+EV.addEventListener("paste",e=>{if(!e.target.closest?.(".rte"))return;e.preventDefault();document.execCommand("insertText",false,(e.clipboardData||window.clipboardData).getData("text/plain"))});
+EV.addEventListener("mousedown",e=>{if(e.target.closest(".tb button"))e.preventDefault()});
+EV.addEventListener("input",e=>{const t=e.target,i=qOf(t),f=t.dataset.f;
+if(t.id=="tt"){cur.title=t.value;return dirty()}if(t.id=="ds"){cur.description=t.value;return dirty()}if(t.id=="du"){cur.durationMinutes=Math.max(1,+t.value||1);return dirty()}
+if(i<0)return;const q=cur.questions[i];
+if(t.classList.contains("rte")){q.text=t.innerHTML;lpq(i)}else if(f=="score")q.score=+t.value||0;else if(f=="ot")q.options[+t.closest(".opr").dataset.o].t=t.value;else if(f=="ans")q.answers=t.value.split("\n");else if(f=="tol")q.tol=Math.abs(+t.value||0);else return;
+dirty();sm()});
+EV.addEventListener("change",e=>{const t=e.target,i=qOf(t),f=t.dataset.f;
+if(t.id=="st"){if(t.value=="published"){const is=pubIssues({...cur,questions:cur.questions});if(is.length){t.value="draft";return mo(`<h3>Can’t publish yet</h3>${is.slice(0,10).map(m=>`<div class="fd"><span>${esc(m)}</span></div>`).join("")}<div class="rw" style="margin-top:14px"><button class="btn" data-x style="flex:1">Close</button></div>`)}}cur.status=t.value;return dirty()}
+if(t.id=="sh1"){cur.shuffleQuestions=t.checked;return dirty()}if(t.id=="sh2"){cur.shuffleOptions=t.checked;return dirty()}
+if(t.dataset.set){const s=new Set(cur.assignedSetterUids);t.checked?s.add(t.dataset.set):s.delete(t.dataset.set);cur.assignedSetterUids=[...s];return dirty()}
+if(t.dataset.sn!==undefined){if(t.value)ex(t.closest(".qc").querySelector(".rte"),"insertText",t.value);t.value="";return}
+if(f=="wd"){if(selImg&&t.value){selImg.style.width=t.value;selImg.closest(".rte").dispatchEvent(new Event("input",{bubbles:true}))}else if(!selImg)toast("Click an image in the editor first.");t.value="";return}
+if(i<0)return;const q=cur.questions[i];
+if(f=="type"){const n=mk(t.value);n.id=q.id;n.text=q.text;n.score=q.score;if(t.value!="short"&&q.options){n.options=q.options;n.correct=t.value=="mcq"?q.correct.slice(0,1):q.correct;n.scoring=q.scoring||"all"}if(t.value=="short"&&q.answers)n.answers=q.answers;cur.questions[i]=n;return redraw()}
+if(f=="mode"){q.mode=t.value;return redraw()}if(f=="scoring")q.scoring=t.value;
+else if(f=="ok"){const k=+t.closest(".opr").dataset.o;q.correct=q.type=="mcq"?[k]:t.checked?[...new Set([...q.correct,k])].sort():q.correct.filter(x=>x!=k)}else return;
+dirty();sm()});
+EV.addEventListener("click",async e=>{const t=e.target;
+if(t.tagName=="IMG"&&t.closest(".rte")){selImg?.classList.remove("on");selImg=t;t.classList.add("on");return}
+const nv=t.closest("[data-nv]");if(nv)return $("#qc"+nv.dataset.nv)?.scrollIntoView({behavior:"smooth",block:"start"});
+const ad=t.closest("[data-add]");if(ad){cur.questions.push(mk(ad.dataset.add));redraw();$("#qc"+(cur.questions.length-1))?.scrollIntoView({behavior:"smooth"});return}
+const c=t.closest("[data-c]");if(c){const rte=c.closest(".qc").querySelector(".rte"),k=c.dataset.c;
+if(k=="up")return pick(d=>putImg(rte,d));if(k=="url"){const u=prompt("Image URL (https://…)");if(u&&u.trim())putImg(rte,u.trim());return}return ex(rte,k)}
+const b=t.closest("[data-a]");if(!b)return;const a=b.dataset.a,i=qOf(b),q=cur.questions[i];
+if(a=="back"){if(!dirtyF||await save())location.hash="";return}
+if(a=="save"){await save();return}if(a=="pvall")return preview(cur.questions);if(a=="pv")return preview([q],i);
+if(a=="mvu"||a=="mvd"){const j=a=="mvu"?i-1:i+1;if(j<0||j>=cur.questions.length)return;[cur.questions[i],cur.questions[j]]=[cur.questions[j],cur.questions[i]];return redraw()}
+if(a=="dup"){const n=structuredClone(q);n.id=gid();cur.questions.splice(i+1,0,n);return redraw()}
+if(a=="del"){if(confirm(`Delete question ${i+1}?`)){cur.questions.splice(i,1);redraw()}return}
+if(a=="oa"){if(q.options.length>=10)return toast("Maximum 10 options.");q.options.push({t:"",img:""});return redraw()}
+if(a=="or"){const k=+b.closest(".opr").dataset.o;if(q.options.length<=3)return toast("A question needs at least 3 options.");q.options.splice(k,1);q.correct=q.correct.filter(x=>x!=k).map(x=>x>k?x-1:x);return redraw()}
+if(a=="on"){const n=+b.dataset.n;while(q.options.length<n)q.options.push({t:"",img:""});if(q.options.length>n){if(q.options.slice(n).some(o=>o.t.trim()||o.img)&&!confirm("Remove the extra options and their content?"))return;q.options.length=n;q.correct=q.correct.filter(x=>x<n)}return redraw()}
+if(a=="oi"){const k=+b.closest(".opr").dataset.o,u=prompt("Paste an image URL, or leave empty to upload a file:");if(u===null)return;if(u.trim()){q.options[k].img=u.trim();redraw()}else pick(d=>{q.options[k].img=d;redraw()});return}
+if(a=="oix"){q.options[+b.closest(".opr").dataset.o].img="";return redraw()}});
+
+// ---------- start ----------
+await loadAll();await route();ready();
+</script></body></html>
