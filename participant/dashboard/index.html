@@ -29,7 +29,7 @@ import{$,esc,toast,guard,shell,hero,ready,errMsg,db,NAV}from"/assets/core.js";
 import{collection,doc,getDoc,getDocs,query,where}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const me=await guard("PARTICIPANT");shell(me,NAV.PARTICIPANT,"dash");hero(me);
 $("#sub").textContent="Participant"+(me.institution?" · "+me.institution:"");
-const EXAM_URL=null; // set to "/participant/exam" when the exam room page exists
+const EXAM_URL="/participant/exam"; // exam room page
 
 // ---------- helpers ----------
 const LET="ABCDEFGHIJ",$$=s=>[...document.querySelectorAll(s)];
