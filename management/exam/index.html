@@ -1,0 +1,229 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exams · Management · CBTNow</title><meta name="robots" content="noindex">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("cbtnow-theme")||"dark"}catch{}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2724%27 fill=%27%236366f1%27/><path d=%27M28 52l16 16 30-34%27 stroke=%27white%27 stroke-width=%2712%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="/assets/theme.css">
+<style>
+select{width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.28);color:var(--tx);font:inherit;outline:0}[data-theme=light] select{background:#fff}
+select option{background:#0b1030;color:#e8ebff}[data-theme=light] select option{background:#fff;color:#0f172a}
+input[type=checkbox],input[type=radio]{width:auto;padding:0;margin:0;accent-color:var(--ac)}
+.btn.on{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 20%,transparent)}
+.ck{display:flex;flex-wrap:wrap;gap:6px}.ck label{margin:0;padding:5px 12px;border:1px solid var(--line);border-radius:99px;cursor:pointer;display:flex;gap:6px;align-items:center;color:var(--tx);font-size:.82rem}
+.chp{display:inline-block;padding:1px 9px;border-radius:99px;font-size:.74rem;border:1px solid var(--line);margin:0 4px 3px 0;color:var(--mu)}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}.pk{margin:0;display:flex;flex-direction:column;gap:10px}.pk h3{margin:0}.mt{color:var(--mu);font-size:.85rem}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:.86rem;vertical-align:middle}th{color:var(--mu);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.05em}td small{display:block;color:var(--mu)}
+.hd{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 16px;border:1px solid var(--line);border-radius:18px;background:var(--card);margin-bottom:14px}.hd h2{margin:0;font-size:1.4rem}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}@media(max-width:700px){.f2{grid-template-columns:1fr}}
+.mo .card.wd{width:min(900px,100%)}.sl{max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:6px 10px}
+.sl label{display:flex;gap:8px;align-items:center;margin:0;padding:6px 2px;color:var(--tx);font-size:.88rem}
+.hist{display:flex;gap:6px;align-items:flex-end;height:120px;margin:10px 0 26px}.hist div{flex:1;position:relative;background:linear-gradient(var(--ac),var(--v));border-radius:6px 6px 0 0;min-height:3px}.hist small{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-size:.68rem;color:var(--mu)}.hist b{position:absolute;top:-18px;left:0;right:0;text-align:center;font-size:.72rem}
+.ok{color:var(--g)}.bad{color:var(--r)}.wn{color:var(--y)}.tag.r{color:var(--r);border-color:rgba(248,113,113,.5)}.tag.y{color:var(--y);border-color:rgba(251,191,36,.5)}
+.fd.w span{color:var(--r)}
+</style></head>
+<body><div class="bgfx"></div><div class="load" id="load"><i></i></div>
+<div class="app"><aside id="side"></aside><main>
+<section class="hero" id="hero"><div><h1>Exams &amp; sessions</h1><p>Plan events, schedule secure sessions, monitor live and publish results.</p></div><div class="clk"><div class="big mono" id="ck"></div><small id="dtx"></small></div></section>
+<div class="stats" id="stats"></div>
+<div id="v"></div>
+</main></div><div class="mo" id="mo"></div><div class="toast" id="toast"></div>
+
+<script type="module">
+import{$,esc,toast,guard,shell,hero,ready,errMsg,db,NAV,logoData}from"/assets/core.js";
+import{collection,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,query,where,writeBatch,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const me=await guard("MANAGEMENT");shell(me,NAV.MANAGEMENT,"exam");hero(me);
+
+// ---------- helpers ----------
+const $$=s=>[...document.querySelectorAll(s)],LET="ABCDEFGHIJ";
+const CHT="abcdefghjkmnpqrstuvwxyz23456789",tok=()=>Array.from(crypto.getRandomValues(new Uint8Array(6)),b=>CHT[b%CHT.length]).join("").toUpperCase();
+const fdt=t=>t?new Date(t).toLocaleString([],{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"-";
+const hms=ms=>{const s=Math.max(0,Math.round(ms/1e3)),d=Math.floor(s/86400);return(d?d+"d ":"")+[Math.floor(s%86400/3600),Math.floor(s/60)%60,s%60].map(n=>String(n).padStart(2,"0")).join(":")};
+const toLocal=t=>new Date(t-new Date(t).getTimezoneOffset()*6e4).toISOString().slice(0,16);
+const renderMath=el=>window.renderMathInElement&&renderMathInElement(el,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false},{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false});
+const clean=h=>{const r=new DOMParser().parseFromString(`<div>${h||""}</div>`,"text/html").body.firstChild;r.querySelectorAll("script,style,iframe,object,embed,link,meta,form").forEach(e=>e.remove());r.querySelectorAll("*").forEach(e=>[...e.attributes].forEach(a=>{const n=a.name.toLowerCase(),v=a.value.trim().toLowerCase();if(n.startsWith("on")||(["href","src"].includes(n)&&/^(javascript|data:text|vbscript)/.test(v)))e.removeAttribute(a.name)}));return r.innerHTML};
+const mo=(h,w)=>{$("#mo").innerHTML=`<div class="card ${w?"wd":""}">${h}</div>`;$("#mo").classList.add("show")},cmo=()=>$("#mo").classList.remove("show");
+$("#mo").onclick=e=>{if(e.target.id=="mo"||e.target.closest("[data-x]"))cmo()};
+const dl=(name,rows)=>{const q=v=>`"${String(v??"").replace(/"/g,'""')}"`,a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\uFEFF"+rows.map(r=>r.map(q).join(",")).join("\r\n")],{type:"text/csv"}));a.download=name;a.click()};
+function parseCSV(t){t=t.replace(/^\uFEFF/,"");const f=t.split(/\r?\n/)[0],dm=(f.match(/;/g)||[]).length>(f.match(/,/g)||[]).length?";":",",rows=[];let r=[],c="",q=false;
+for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch=='"'){if(t[i+1]=='"'){c+='"';i++}else q=false}else c+=ch}else if(ch=='"')q=true;else if(ch==dm){r.push(c);c=""}else if(ch=="\n"||ch=="\r"){if(ch=="\r"&&t[i+1]=="\n")i++;r.push(c);c="";if(r.some(x=>x.trim()))rows.push(r);r=[]}else c+=ch}
+r.push(c);if(r.some(x=>x.trim()))rows.push(r);return rows}
+
+// ---------- grading (answers are keyed by question id: mcq = option index, complex = array of indices, short = text) ----------
+const has=v=>v!=null&&v!==""&&!(Array.isArray(v)&&!v.length);
+function gradeQ(q,v){if(!has(v))return{pts:0,ok:false,ans:false};
+if(q.type=="short"){const s=String(v).trim(),A=q.answers||[];let ok;
+if(q.mode=="number"){const n=+s.replace(",",".");ok=!isNaN(n)&&A.some(a=>Math.abs(+String(a).replace(",",".")-n)<=(q.tol||0)+1e-9)}
+else if(q.mode=="exact")ok=A.some(a=>a.trim()===s);else{const nz=x=>x.trim().toLowerCase().replace(/\s+/g," ");ok=A.some(a=>nz(a)===nz(s))}
+return{pts:ok?q.score:0,ok,ans:true}}
+if(q.type=="mcq"){const ok=q.correct[0]===+v;return{pts:ok?q.score:0,ok,ans:true}}
+const sel=new Set([].concat(v).map(Number)),cor=new Set(q.correct),r=[...sel].filter(x=>cor.has(x)).length,w=sel.size-r,ok=r==cor.size&&w==0;
+return{pts:q.scoring=="partial"?+(q.score*Math.max(0,(r-w)/cor.size)).toFixed(2):ok?q.score:0,ok,ans:true}}
+function grade(qs,a){let score=0,correct=0,wrong=0;qs.forEach(q=>{const g=gradeQ(q,(a||{})[q.id]);score+=g.pts;if(g.ans){g.ok?correct++:wrong++}});return{score:+score.toFixed(2),correct,wrong}}
+const maxOf=p=>(p?.questions||[]).reduce((a,q)=>a+(+q.score||0),0);
+
+// ---------- data ----------
+let E=[],S=[],U=[],C=[],P=[],UM={},PM={},CS=null,CPK=null,subs=[],unsub=null,tick=null,tab="live",RF={cls:""},IM=[];
+const w=where("createdBy","==",me.uid);
+async function loadAll(){try{const r=await Promise.all(["events","exam_sessions","users","classes","question_packages"].map(c=>getDocs(query(collection(db,c),w))));
+const m=i=>r[i].docs.map(d=>({id:d.id,...d.data()}));E=m(0);S=m(1);U=m(2).filter(u=>["PARTICIPANT","PROCTOR"].includes(u.role));C=m(3).sort((a,b)=>a.name.localeCompare(b.name));P=m(4).map(p=>({questions:[],...p}));
+UM=Object.fromEntries(U.map(u=>[u.id,u]));PM=Object.fromEntries(P.map(p=>[p.id,p]))}catch(x){toast(errMsg(x))}}
+const sst=s=>{const n=Date.now();return n<s.startTime?"Upcoming":n>s.endTime?"Finished":"Live"};
+const stTag=s=>{const x=sst(s);return`<span class="tag ${x=="Live"?"g":x=="Upcoming"?"a":""}">${x}</span>`};
+const showHero=b=>$("#hero").style.display=$("#stats").style.display=b?"":"none";
+const evOf=id=>E.find(e=>e.id==id);
+const partsOf=s=>(s.assignedParticipantUids||[]).map(id=>UM[id]).filter(Boolean);
+
+// ---------- routing ----------
+async function route(){const h=location.hash;let m;
+if(m=h.match(/^#\/session\/([^/]+)(?:\/(\w+))?$/)){if(CS&&CS.id==m[1]&&unsub){tab=m[2]||"live";return drawSess()}await loadAll();return viewSession(m[1],m[2]||"live")}
+leave();await loadAll();if(m=h.match(/^#\/event\/(.+)$/))return viewEvent(m[1]);return viewEvents()}
+function leave(){unsub&&unsub();unsub=null;clearInterval(tick);CS=null;subs=[]}
+addEventListener("hashchange",route);
+
+// ---------- events ----------
+function viewEvents(){showHero(true);const up=S.filter(s=>sst(s)=="Upcoming").length,lv=S.filter(s=>sst(s)=="Live").length;
+$("#stats").innerHTML=[["Events",E.length],["Sessions",S.length],["Live now",lv],["Upcoming",up]].map(([l,v],i)=>`<div class="st" style="animation-delay:${i*60}ms"><b>${v}</b><span>${l}</span></div>`).join("");
+$("#v").innerHTML=`<div class="rw" style="margin-bottom:16px"><input id="eq" placeholder="Search events…" style="max-width:320px"><span style="flex:1"></span><button class="btn p" data-a="ne">＋ New event</button></div><div class="pg" id="eg"></div>`;$("#eq").oninput=drawEvents;drawEvents()}
+const logo=(x,s=44)=>x.logoUrl?`<img class="av" style="width:${s}px;height:${s}px" src="${esc(x.logoUrl)}" alt="">`:`<div class="av" style="width:${s}px;height:${s}px">${esc((x.title||"?")[0].toUpperCase())}</div>`;
+function drawEvents(){const q=($("#eq")?.value||"").toLowerCase(),L=E.filter(e=>e.title.toLowerCase().includes(q)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+$("#eg").innerHTML=L.map(e=>{const ss=S.filter(s=>s.eventId==e.id).sort((a,b)=>a.startTime-b.startTime),nx=ss.find(s=>sst(s)!="Finished");
+return`<div class="card pk"><div class="rw">${logo(e)}<h3>${esc(e.title)}</h3></div><p class="mt">${esc(e.description||"No description")}</p><div class="mt">${ss.length} session(s)${nx?` · next: ${esc(nx.title)} (${fdt(nx.startTime)})`:""}</div><div class="rw" style="margin-top:auto;flex-wrap:wrap"><button class="btn s p" data-a="oe" data-id="${e.id}">Open</button><button class="btn s" data-a="ee" data-id="${e.id}">Edit</button><button class="btn s x" data-a="de" data-id="${e.id}">Delete</button></div></div>`}).join("")||`<div class="card" style="grid-column:1/-1"><p class="em">${E.length?"No events match.":"No events yet. Create your first exam event."}</p></div>`}
+function eventForm(e){const v=e||{title:"",description:"",logoUrl:""};let lg;
+mo(`<h3>${e?"Edit event":"New event"}</h3><form id="ef" novalidate><label for="et">Event title</label><input id="et" value="${esc(v.title)}" required><label for="edc">Description</label><textarea id="edc">${esc(v.description)}</textarea><label for="elg">Logo (optional)</label><input id="elg" type="file" accept="image/*"><label style="display:flex;gap:8px;align-items:center"><input id="erm" type="checkbox"> Remove current logo</label><div class="rw" style="margin-top:16px"><button type="button" class="btn" data-x style="flex:1">Cancel</button><button class="btn p" style="flex:1">Save</button></div></form>`);
+$("#ef").onsubmit=async ev=>{ev.preventDefault();const t=$("#et").value.trim();if(!t)return toast("Title is required.");
+try{const d={title:t,description:$("#edc").value.trim(),logoUrl:v.logoUrl||""},f=$("#elg").files[0];if(f)d.logoUrl=await logoData(f);else if($("#erm").checked)d.logoUrl="";
+if(e)await updateDoc(doc(db,"events",e.id),d);else{const r=doc(collection(db,"events"));await setDoc(r,{id:r.id,...d,createdBy:me.uid,createdAt:Date.now()})}cmo();toast("Saved.");await route()}catch(x){toast(errMsg(x))}}}
+
+// ---------- event detail (sessions) ----------
+function viewEvent(id){const e=evOf(id);if(!e){toast("Event not found.");location.hash="";return}showHero(false);
+const ss=S.filter(s=>s.eventId==id).sort((a,b)=>a.startTime-b.startTime);
+$("#v").innerHTML=`<div class="hd"><button class="btn s" data-a="home">← Events</button>${logo(e,40)}<div style="flex:1;min-width:200px"><h2>${esc(e.title)}</h2><small style="color:var(--mu)">${esc(e.description||"")}</small></div><button class="btn s" data-a="ee" data-id="${e.id}">Edit event</button><button class="btn p" data-a="ns" data-id="${e.id}">＋ New session</button></div>
+<div class="pg">${ss.map(s=>`<div class="card pk"><div style="display:flex;justify-content:space-between;gap:8px"><h3>${esc(s.title)}</h3><span>${stTag(s)}${s.resultsPublished?' <span class="tag g">Results published</span>':""}</span></div>
+<div class="mt">📦 ${esc(PM[s.packageId]?.title||"Package removed")}</div><div class="mt">🗓 ${fdt(s.startTime)} → ${fdt(s.endTime)} · ${s.durationMinutes} min</div><div class="mt">👥 ${(s.assignedParticipantUids||[]).length} participants · 🛡 ${(s.assignedProctorUids||[]).map(u=>esc(UM[u]?.name||"?")).join(", ")||"no proctor"}</div>
+<div class="mt">🔑 Token: <b class="mono" id="t${s.id}" data-t="${esc(s.token)}">••••••</b> <button class="btn s" data-a="tk" data-id="${s.id}">Show</button> <button class="btn s" data-a="cp" data-id="${s.id}">Copy</button></div>
+<div class="rw" style="margin-top:auto;flex-wrap:wrap"><button class="btn s p" data-a="os" data-id="${s.id}">Monitor</button><button class="btn s" data-a="or" data-id="${s.id}">Results</button><button class="btn s" data-a="es" data-id="${s.id}">Edit</button><button class="btn s" data-a="ds" data-id="${s.id}">Duplicate</button><button class="btn s x" data-a="xs" data-id="${s.id}">Delete</button></div></div>`).join("")||'<div class="card" style="grid-column:1/-1"><p class="em">No sessions yet. Create the first one with “New session”.</p></div>'}</div>`}
+
+// ---------- session form ----------
+async function sessForm(eid,s){const pubs=P.filter(p=>p.status=="published"),ed=!!s;
+if(!pubs.length&&!ed)return toast("Publish a question package first (Questions page).");
+let locked=false;if(ed){try{locked=!(await getDocs(query(collection(db,"exam_submissions"),where("sessionId","==",s.id)))).empty}catch{}}
+const st0=Math.ceil((Date.now()+36e5)/36e5)*36e5,v=s||{title:"",description:"",packageId:pubs[0].id,durationMinutes:pubs[0].durationMinutes||60,startTime:st0,endTime:st0+72e5,token:tok(),assignedProctorUids:[],classIds:[],violationRules:{tab:true,copy:true,shot:true}};
+const clsM=new Set((C.filter(c=>(v.classIds||[]).includes(c.id))).flatMap(c=>c.studentUids||[])),ind=new Set(v.individualUids||(v.assignedParticipantUids||[]).filter(u=>!clsM.has(u))),PA=U.filter(u=>u.role=="PARTICIPANT"),PR=U.filter(u=>u.role=="PROCTOR"),vr=v.violationRules||{};
+const pk=ed&&!PM[v.packageId]?[]:pubs.concat(ed&&PM[v.packageId]&&PM[v.packageId].status!="published"?[PM[v.packageId]]:[]);
+mo(`<h3>${ed?"Edit session":"New session"}</h3><form id="sf" novalidate>
+<div class="f2"><div><label for="sn">Session name</label><input id="sn" value="${esc(v.title)}" required></div><div><label for="sp">Question package</label><select id="sp" ${locked?"disabled":""}>${pk.map(p=>`<option value="${p.id}" data-d="${p.durationMinutes}" ${p.id==v.packageId?"selected":""}>${esc(p.title)} (${p.questions.length} q · ${maxOf(p)} pts)</option>`).join("")}</select>${locked?'<small style="color:var(--y)">Locked: this session already has results.</small>':""}</div></div>
+<label for="sd">Description</label><textarea id="sd" rows="2">${esc(v.description||"")}</textarea>
+<div class="f2"><div><label for="ss">Start</label><input id="ss" type="datetime-local" value="${toLocal(v.startTime)}" required></div><div><label for="se">Hard end (mandatory)</label><input id="se" type="datetime-local" value="${toLocal(v.endTime)}" required></div><div><label for="su">Duration per participant (minutes)</label><input id="su" type="number" min="1" value="${v.durationMinutes}"></div><div><label for="st">Security token</label><div class="rw"><input id="st" value="${esc(v.token)}" class="mono" style="text-transform:uppercase"><button type="button" class="btn s" id="sg">Generate</button></div></div></div>
+<label>Proctors</label><div class="ck">${PR.map(u=>`<label><input type="checkbox" data-pr="${u.id}" ${(v.assignedProctorUids||[]).includes(u.id)?"checked":""}>${esc(u.name)}</label>`).join("")||'<small style="color:var(--mu)">No proctors yet (Accounts page). You can still monitor as Management.</small>'}</div>
+<label>Participants · classes</label><div class="ck">${C.map(c=>`<label><input type="checkbox" data-cl="${c.id}" ${(v.classIds||[]).includes(c.id)?"checked":""}>${esc(c.name)} (${(c.studentUids||[]).length})</label>`).join("")||'<small style="color:var(--mu)">No classes yet.</small>'}</div>
+<label>Participants · individuals</label><input id="si" placeholder="Search participants…"><div class="rw" style="margin:6px 0"><button type="button" class="btn s" id="sa">Select all shown</button><button type="button" class="btn s" id="sx">Clear individuals</button><b id="sn2" style="margin-left:auto"></b></div>
+<div class="sl" id="sl">${PA.map(u=>`<label data-n="${esc((u.name+" "+(u.loginId||"")+" "+(u.institution||"")).toLowerCase())}"><input type="checkbox" data-ind="${u.id}" ${ind.has(u.id)?"checked":""}><span>${esc(u.name)} <small style="display:inline;color:var(--mu)">${esc(u.loginId||"")} · ${esc(u.institution||"-")}</small></span></label>`).join("")||'<small style="color:var(--mu)">No participants yet.</small>'}</div>
+<label>Integrity rules (violation = exam locked for 60 seconds and logged)</label><div class="ck"><label><input type="checkbox" id="r1" ${vr.tab!==false?"checked":""}>Tab / app switch</label><label><input type="checkbox" id="r2" ${vr.copy!==false?"checked":""}>Copy · paste · right-click</label><label><input type="checkbox" id="r3" ${vr.shot!==false?"checked":""}>Screenshot keys</label></div>
+<div class="rw" style="margin-top:18px"><button type="button" class="btn" data-x style="flex:1">Cancel</button><button class="btn p" style="flex:1">${ed?"Save changes":"Create session"}</button></div></form>`,true);
+const tgt=()=>{const cl=$$("[data-cl]:checked").map(i=>i.dataset.cl),id=$$("[data-ind]:checked").map(i=>i.dataset.ind),set=new Set(id);C.filter(c=>cl.includes(c.id)).forEach(c=>(c.studentUids||[]).forEach(u=>set.add(u)));return{cl,ind:id,all:[...set].filter(u=>UM[u]?.role=="PARTICIPANT")}};
+const cnt=()=>$("#sn2").textContent=tgt().all.length+" participants in total";cnt();$("#sf").addEventListener("change",cnt);
+$("#sp").onchange=e=>{$("#su").value=e.target.selectedOptions[0].dataset.d||$("#su").value};$("#sg").onclick=()=>$("#st").value=tok();
+$("#si").oninput=e=>{const q=e.target.value.toLowerCase();$$("#sl label").forEach(l=>l.style.display=l.dataset.n.includes(q)?"flex":"none")};
+$("#sa").onclick=()=>{$$("#sl label").filter(l=>l.style.display!="none").forEach(l=>l.querySelector("input").checked=true);cnt()};$("#sx").onclick=()=>{$$("[data-ind]").forEach(i=>i.checked=false);cnt()};
+$("#sf").onsubmit=async e=>{e.preventDefault();const t=tgt(),a=new Date($("#ss").value).getTime(),b=new Date($("#se").value).getTime(),dur=Math.max(1,+$("#su").value||0),tk=$("#st").value.trim().toUpperCase();
+if(!$("#sn").value.trim())return toast("Session name is required.");if(!$("#sp").value)return toast("Choose a question package.");if(!(a&&b)||b<=a)return toast("The hard end must be after the start.");if(tk.length<4)return toast("Token must be at least 4 characters.");if(!t.all.length)return toast("Select at least one participant or class.");
+if(dur>(b-a)/6e4&&!confirm("The duration is longer than the time window. Participants will be cut off at the hard end time. Continue?"))return;
+const d={eventId:eid,title:$("#sn").value.trim(),description:$("#sd").value.trim(),packageId:$("#sp").value,durationMinutes:dur,startTime:a,endTime:b,token:tk,assignedProctorUids:$$("[data-pr]:checked").map(i=>i.dataset.pr),assignedParticipantUids:t.all,classIds:t.cl,individualUids:t.ind,violationRules:{tab:$("#r1").checked,copy:$("#r2").checked,shot:$("#r3").checked},lockSeconds:60,updatedAt:Date.now()};
+try{if(ed)await updateDoc(doc(db,"exam_sessions",s.id),d);else{const r=doc(collection(db,"exam_sessions"));await setDoc(r,{id:r.id,...d,resultsPublished:false,resultsShow:"summary",passScore:null,createdBy:me.uid,createdAt:Date.now()})}cmo();toast("Session saved.");await route()}catch(x){toast(errMsg(x))}}}
+
+// ---------- list actions ----------
+$("#v").addEventListener("click",async e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,id=b.dataset.id,s=S.find(x=>x.id==id),ev=evOf(id);
+if(a=="ne")return eventForm();if(a=="ee")return eventForm(ev);if(a=="oe")return location.hash="#/event/"+id;if(a=="home")return location.hash="";
+if(a=="de"){if(S.some(x=>x.eventId==id))return toast("Delete or move this event’s sessions first.");if(confirm(`Delete event “${ev.title}”?`)){await deleteDoc(doc(db,"events",id));toast("Event deleted.");await route()}return}
+if(a=="ns")return sessForm(id);if(a=="es")return sessForm(s.eventId,s);if(a=="os")return location.hash="#/session/"+id;if(a=="or")return location.hash="#/session/"+id+"/results";
+if(a=="tk"){const t=$("#t"+id);const hid=t.textContent.includes("•");t.textContent=hid?t.dataset.t:"••••••";b.textContent=hid?"Hide":"Show";return}
+if(a=="cp")return navigator.clipboard.writeText(s.token).then(()=>toast("Token copied."));
+if(a=="ds"){const r=doc(collection(db,"exam_sessions"));try{await setDoc(r,{...s,id:r.id,title:s.title+" (copy)",token:tok(),resultsPublished:false,passScore:null,createdAt:Date.now(),updatedAt:Date.now()});toast("Session duplicated. Edit it to set a new time.");await route()}catch(x){toast(errMsg(x))}return}
+if(a=="xs"){try{const sb=await getDocs(query(collection(db,"exam_submissions"),where("sessionId","==",id)));if(!confirm(`Delete “${s.title}”${sb.size?` and its ${sb.size} participant result(s)`:""}? This can’t be undone.`))return;
+for(let i=0;i<sb.docs.length;i+=400){const bt=writeBatch(db);sb.docs.slice(i,i+400).forEach(d=>bt.delete(d.ref));await bt.commit()}await deleteDoc(doc(db,"exam_sessions",id));toast("Session deleted.");await route()}catch(x){toast(errMsg(x))}}});
+
+// ---------- session view ----------
+const stOf=x=>!x?"Not started":x.isBlocked?"Blocked":x.status=="submitted"?"Submitted":"In progress";
+const stCls=k=>({Submitted:"g","In progress":"a",Blocked:"r","Not started":""}[k]);
+const rowsOf=()=>partsOf(CS).map(u=>({u,x:subs.find(b=>b.participantUid==u.id)}));
+const clsNames=u=>C.filter(c=>(c.studentUids||[]).includes(u.id)).map(c=>c.name);
+async function viewSession(id,t){CS=S.find(x=>x.id==id);if(!CS){toast("Session not found.");location.hash="";return}CPK=PM[CS.packageId]||{questions:[],title:"(package removed)"};tab=t;showHero(false);leave2();
+unsub=onSnapshot(query(collection(db,"exam_submissions"),where("sessionId","==",id)),q=>{subs=q.docs.map(d=>({id:d.id,...d.data()}));if(tab!="pub")drawTab()},x=>toast(errMsg(x)));drawSess()}
+const leave2=()=>{unsub&&unsub();unsub=null;clearInterval(tick);subs=[]};
+function drawSess(){const s=CS,e=evOf(s.eventId);
+$("#v").innerHTML=`<div class="hd"><button class="btn s" data-a="${e?"oe":"home"}" data-id="${s.eventId}">← ${e?esc(e.title):"Events"}</button><div style="flex:1;min-width:220px"><h2>${esc(s.title)} ${stTag(s)}</h2><small style="color:var(--mu)">📦 ${esc(CPK.title)} · ${maxOf(CPK)} pts · ${fdt(s.startTime)} → ${fdt(s.endTime)} · ${s.durationMinutes} min</small></div><div class="mono" id="cd" style="color:var(--ac);font-size:1.1rem"></div><span class="mt">🔑 <b class="mono">${esc(s.token)}</b></span></div>
+<div class="seg" style="margin-bottom:16px;flex-wrap:wrap">${[["live","📡 Live monitor"],["results","🏆 Results"],["pub","📣 Publish & import"]].map(([k,l])=>`<button class="btn ${tab==k?"on":""}" data-a="tab" data-id="${k}">${l}</button>`).join("")}</div><div id="sc"></div>`;
+$$("[data-a=tab]").forEach(b=>b.onclick=()=>location.hash=`#/session/${s.id}/${b.dataset.id}`);
+drawTab();clearInterval(tick);tick=setInterval(()=>{const n=Date.now(),c=$("#cd");if(c)c.textContent=n<s.startTime?"starts in "+hms(s.startTime-n):n<=s.endTime?"ends in "+hms(s.endTime-n):"finished";$$("[data-dl]").forEach(el=>el.textContent=hms(+el.dataset.dl-n))},1000)}
+function drawTab(){if(!CS||!$("#sc"))return;tab=="results"?drawResults():tab=="pub"?drawPub():drawLive()}
+
+// live monitor
+function drawLive(){const R=rowsOf(),c=k=>R.filter(r=>stOf(r.x)==k).length,vl=subs.reduce((a,x)=>a+(x.violationLogs||[]).length,0),qn=CPK.questions.length,logs=subs.flatMap(x=>(x.violationLogs||[]).map(v=>({...v,n:x.participantName}))).sort((a,b)=>b.at-a.at).slice(0,40);
+$("#sc").innerHTML=`<div class="stats" style="margin-top:0">${[["Enrolled",R.length],["Not started",c("Not started")],["In progress",c("In progress")],["Submitted",c("Submitted")],["Blocked",c("Blocked")],["Violations",vl]].map(([l,v])=>`<div class="st"><b>${v}</b><span>${l}</span></div>`).join("")}</div>
+<div class="card"><h3>Participants (live)</h3><div class="tw"><table><thead><tr><th>Participant</th><th>Status</th><th>Answered</th><th>Time left</th><th>Violations</th><th>Notes</th><th></th></tr></thead><tbody>${R.map(({u,x})=>{const dlx=x&&x.status!="submitted"&&x.startedAt?Math.min(x.startedAt+CS.durationMinutes*6e4,CS.endTime):0,an=x?CPK.questions.filter(q=>has((x.answers||{})[q.id])).length:0;
+return`<tr><td><b>${esc(u.name)}</b><small>${esc(u.loginId||u.email)} · ${esc(u.institution||"-")}</small></td><td><span class="tag ${stCls(stOf(x))}">${stOf(x)}</span></td><td>${x?`${an}/${qn}`:"-"}</td><td class="mono" ${dlx?`data-dl="${dlx}"`:""}>${dlx?hms(dlx-Date.now()):"-"}</td><td>${(x?.violationLogs||[]).length||"-"}</td><td>${esc(x?.notes||"")}</td><td style="white-space:nowrap">${x?`<button class="btn s" data-a="blk" data-id="${x.id}">${x.isBlocked?"Unblock":"Block"}</button> <button class="btn s" data-a="note" data-id="${x.id}">Note</button> ${x.status!="submitted"?`<button class="btn s x" data-a="force" data-id="${x.id}">Force submit</button> `:""}<button class="btn s" data-a="det" data-id="${x.id}">Detail</button> <button class="btn s x" data-a="rst" data-id="${x.id}" title="Delete this attempt so the participant can start again">Reset</button>`:""}</td></tr>`}).join("")||'<tr><td colspan="7" class="em">No participants assigned.</td></tr>'}</tbody></table></div></div>
+<div class="card"><h3>Violation log</h3>${logs.map(v=>`<div class="fd w"><span>${esc(v.n)}: ${esc(v.type)}</span><small>${fdt(v.at)}</small></div>`).join("")||'<p class="em">No violations recorded.</p>'}</div>`}
+const sub=id=>subs.find(x=>x.id==id),sref=id=>doc(db,"exam_submissions",id);
+$("#v").addEventListener("click",async e=>{const b=e.target.closest("[data-a]");if(!b||!CS)return;const a=b.dataset.a,id=b.dataset.id,x=sub(id);
+try{if(a=="blk")return await updateDoc(sref(id),{isBlocked:!x.isBlocked});
+if(a=="note"){const n=prompt("Note for this participant:",x.notes||"");if(n!==null)await updateDoc(sref(id),{notes:n});return}
+if(a=="force"){if(!confirm("Submit this participant’s saved answers now and grade them?"))return;const g=grade(CPK.questions,x.answers),n=Date.now();await updateDoc(sref(id),{status:"submitted",forceSubmit:true,score:g.score,correctCount:g.correct,wrongCount:g.wrong,finishedAt:n,timeSpent:n-(x.startedAt||n)});return toast("Submitted.")}
+if(a=="rst"){if(confirm(`Delete ${x.participantName}’s attempt? They will be able to start again.`)){await deleteDoc(sref(id));toast("Attempt reset.")}return}
+if(a=="det")return detail(x);if(a=="edsc")return editScore(x);if(a=="rc"){await recalc(x);return toast("Recalculated.")}
+}catch(z){toast(errMsg(z))}});
+
+// results
+function resRows(){const mem=RF.cls?new Set(C.find(c=>c.id==RF.cls)?.studentUids||[]):null,R=rowsOf().filter(r=>r.x?.status=="submitted"&&(!mem||mem.has(r.u.id))).sort((a,b)=>b.x.score-a.x.score);let rk=0,pv=null;R.forEach((r,i)=>{if(r.x.score!==pv){rk=i+1;pv=r.x.score}r.rank=rk});return R}
+const src=x=>x.imported?"Imported":x.manual?"Adjusted":"Exam";
+function drawResults(){const R=resRows(),mx=maxOf(CPK),sc=R.map(r=>+r.x.score||0),n=sc.length,avg=n?sc.reduce((a,b)=>a+b,0)/n:0,sorted=[...sc].sort((a,b)=>a-b),med=n?(n%2?sorted[(n-1)/2]:(sorted[n/2-1]+sorted[n/2])/2):0,ps=CS.passScore,pass=ps!=null&&n?Math.round(sc.filter(v=>v>=ps).length/n*100):null,
+bk=Array(10).fill(0);sc.forEach(v=>bk[Math.min(9,Math.floor((mx?v/mx:0)*10))]++);const bm=Math.max(1,...bk),pending=partsOf(CS).length-rowsOf().filter(r=>r.x?.status=="submitted").length;
+$("#sc").innerHTML=`<div class="stats" style="margin-top:0">${[["Results",n],["Average",n?avg.toFixed(1)+" / "+mx:"-"],["Median",n?med:"-"],["Highest",n?Math.max(...sc):"-"],["Lowest",n?Math.min(...sc):"-"],["Pass rate",pass==null?"-":pass+"%"]].map(([l,v])=>`<div class="st"><b>${v}</b><span>${l}</span></div>`).join("")}</div>
+<div class="card"><h3><span>Score distribution</span><span class="rw"><select id="rfc" style="width:auto"><option value="">All classes</option>${C.map(c=>`<option value="${c.id}" ${RF.cls==c.id?"selected":""}>${esc(c.name)}</option>`).join("")}</select></span></h3><div class="hist">${bk.map((v,i)=>`<div style="height:${Math.round(v/bm*100)}%">${v?`<b>${v}</b>`:""}<small>${i*10}–${i*10+10}%</small></div>`).join("")}</div></div>
+<div class="card"><h3><span>Participant results</span><span class="rw" style="flex-wrap:wrap"><button class="btn s" data-a="rcall">Recalculate all</button><button class="btn s" data-a="exr">⬇ Export results CSV</button><button class="btn s" data-a="exa">⬇ Export per-question points</button></span></h3>${pending>0?`<p class="em" style="padding-top:0">${pending} participant(s) have no submitted result yet.</p>`:""}
+<div class="tw"><table><thead><tr><th>#</th><th>Participant</th><th>Score</th><th>%</th><th>✔ / ✖</th><th>Time</th><th>Finished</th><th>Viol.</th><th>Result</th><th>Source</th><th></th></tr></thead><tbody>${R.map(({u,x,rank})=>`<tr><td><b>${rank}</b></td><td><b>${esc(u.name)}</b><small>${esc(u.loginId||u.email)}${clsNames(u).length?" · "+esc(clsNames(u).join(", ")):""}</small></td><td><b>${x.score}</b> / ${mx}</td><td>${mx?Math.round(x.score/mx*100):0}%</td><td>${x.correctCount??"-"} / ${x.wrongCount??"-"}</td><td>${x.timeSpent?Math.round(x.timeSpent/6e4)+" min":"-"}</td><td>${fdt(x.finishedAt)}</td><td>${(x.violationLogs||[]).length||"-"}</td><td>${ps==null?"-":`<span class="tag ${x.score>=ps?"g":"r"}">${x.score>=ps?"Pass":"Fail"}</span>`}</td><td><span class="tag ${x.imported||x.manual?"y":""}">${src(x)}</span></td><td style="white-space:nowrap"><button class="btn s" data-a="det" data-id="${x.id}">Detail</button> <button class="btn s" data-a="edsc" data-id="${x.id}">Edit score</button>${!x.imported?` <button class="btn s" data-a="rc" data-id="${x.id}" title="Re-grade from saved answers">↻</button>`:""}</td></tr>`).join("")||'<tr><td colspan="11" class="em">No submitted results yet.</td></tr>'}</tbody></table></div></div>`;
+$("#rfc").onchange=e=>{RF.cls=e.target.value;drawResults()}}
+async function recalc(x){const g=grade(CPK.questions,x.answers);await updateDoc(sref(x.id),{score:g.score,correctCount:g.correct,wrongCount:g.wrong,manual:false})}
+$("#v").addEventListener("click",async e=>{const b=e.target.closest("[data-a]");if(!b||!CS)return;const a=b.dataset.a,mx=maxOf(CPK);
+if(a=="rcall"){const t=subs.filter(x=>x.status=="submitted"&&!x.imported&&!x.manual);if(!t.length)return toast("Nothing to recalculate.");if(!confirm(`Re-grade ${t.length} result(s) from their saved answers using the current answer key? Manually adjusted and imported scores are kept.`))return;try{for(const x of t)await recalc(x);toast("Recalculated.")}catch(z){toast(errMsg(z))}}
+if(a=="exr"){const R=rowsOf();dl(`${CS.title} - results.csv`,[["Full Name","ID","Institution","Classes","Status","Score","Max","Percent","Correct","Wrong","Unanswered","Time (min)","Started","Finished","Violations","Result","Source","Notes"],...R.map(({u,x})=>{const sb=x?.status=="submitted";return[u.name,u.loginId||u.email,u.institution||"",clsNames(u).join(";"),stOf(x),sb?x.score:"",mx,sb&&mx?Math.round(x.score/mx*100):"",sb?x.correctCount??"":"",sb?x.wrongCount??"":"",sb&&x.correctCount!=null?CPK.questions.length-x.correctCount-x.wrongCount:"",sb&&x.timeSpent?(x.timeSpent/6e4).toFixed(1):"",x?fdt(x.startedAt):"",sb?fdt(x.finishedAt):"",(x?.violationLogs||[]).length,CS.passScore==null||!sb?"":x.score>=CS.passScore?"Pass":"Fail",sb?src(x):"",x?.notes||""]})])}
+if(a=="exa"){const R=rowsOf().filter(r=>r.x?.status=="submitted");dl(`${CS.title} - per question.csv`,[["Full Name","ID",...CPK.questions.map((q,i)=>`Q${i+1} (${q.score})`),"Total"],...R.map(({u,x})=>[u.name,u.loginId||u.email,...CPK.questions.map(q=>gradeQ(q,(x.answers||{})[q.id]).pts),x.score])])}});
+function editScore(x){const mx=maxOf(CPK);mo(`<h3>Edit score · ${esc(x.participantName)}</h3><form id="esf" novalidate><label for="esv">Score (0–${mx})</label><input id="esv" type="number" min="0" max="${mx}" step="0.01" value="${x.score}"><label for="esn">Reason (optional)</label><input id="esn" value="${esc(x.adjustNote||"")}" placeholder="e.g. Re-marked question 5"><div class="rw" style="margin-top:16px"><button type="button" class="btn" data-x style="flex:1">Cancel</button><button class="btn p" style="flex:1">Save</button></div></form>`);
+$("#esf").onsubmit=async ev=>{ev.preventDefault();const v=+$("#esv").value;if(isNaN(v)||v<0||v>mx)return toast(`Score must be between 0 and ${mx}.`);try{await updateDoc(sref(x.id),{score:v,manual:true,adjustNote:$("#esn").value.trim()});cmo();toast("Score updated.")}catch(z){toast(errMsg(z))}}}
+function detail(x){const u=UM[x.participantUid]||{name:x.participantName,loginId:""},mx=maxOf(CPK),has2=x.answers&&Object.keys(x.answers).length;
+const key=q=>q.type=="short"?esc((q.answers||[]).join(" | ")):q.correct.map(i=>LET[i]).join(", "),at=(q,v)=>!has(v)?"-":q.type=="short"?esc(v):[].concat(v).map(i=>`${LET[i]}. ${esc(q.options[i]?.t||"")}`).join(", ");
+mo(`<h3><span>${esc(u.name)} <small style="color:var(--mu)">${esc(u.loginId||"")}</small></span><span class="tag ${stCls(stOf(x))}">${stOf(x)}</span></h3><div class="rw" style="gap:22px;margin-bottom:10px"><div><b style="font-size:1.4rem">${x.score??"-"}</b> / ${mx}<br><small style="color:var(--mu)">score</small></div><div><b>${fdt(x.startedAt)}</b><br><small style="color:var(--mu)">started</small></div><div><b>${fdt(x.finishedAt)}</b><br><small style="color:var(--mu)">finished</small></div><div><b>${(x.violationLogs||[]).length}</b><br><small style="color:var(--mu)">violations</small></div></div>${x.notes?`<p class="em" style="padding:0">📝 ${esc(x.notes)}</p>`:""}${x.adjustNote?`<p class="em" style="padding:0">✏️ Adjusted: ${esc(x.adjustNote)}</p>`:""}
+${(x.violationLogs||[]).length?`<h4 style="margin:12px 0 4px">Violations</h4>${x.violationLogs.map(v=>`<div class="fd w"><span>${esc(v.type)}</span><small>${fdt(v.at)}</small></div>`).join("")}`:""}
+<h4 style="margin:14px 0 4px">Answer breakdown</h4>${has2?`<div style="max-height:46vh;overflow:auto">${CPK.questions.map((q,i)=>{const v=x.answers[q.id],g=gradeQ(q,v);return`<div class="card" style="margin:8px 0;padding:12px"><div class="rw"><b>${i+1}.</b><span class="tag ${!g.ans?"":g.ok?"g":"r"}">${!g.ans?"Unanswered":g.ok?"Correct":g.pts>0?"Partial":"Wrong"}</span><span class="mt">${g.pts} / ${q.score} pt</span></div><div style="margin:6px 0">${clean(q.text)}</div><div class="mt">Answer: <b style="color:var(--tx)">${at(q,v)}</b> · Key: <b class="ok">${key(q)}</b></div></div>`}).join("")}</div>`:`<p class="em">${x.imported?"This result was imported, so there are no answers to show.":"No saved answers."}</p>`}<div class="rw" style="margin-top:12px"><button class="btn" data-x style="flex:1">Close</button></div>`,true);renderMath($("#mo"))}
+
+// publish & import
+function drawPub(){const s=CS,mx=maxOf(CPK);
+$("#sc").innerHTML=`<div class="card"><h3>Publish results to participants</h3><p class="em" style="padding-top:0">${s.resultsPublished?`<b class="ok">Published</b> on ${fdt(s.resultsPublishedAt)}. Participants can see their results in their account.`:"<b>Not published.</b> Participants can’t see their results yet."}</p>
+<div class="f2"><div><label for="ps">What participants will see</label><select id="ps"><option value="score" ${s.resultsShow=="score"?"selected":""}>Score only</option><option value="summary" ${s.resultsShow!="score"&&s.resultsShow!="review"?"selected":""}>Score + correct / wrong counts</option><option value="review" ${s.resultsShow=="review"?"selected":""}>Full review with answer key</option></select></div><div><label for="pp">Passing score (points, optional)</label><input id="pp" type="number" min="0" max="${mx}" step="0.5" value="${s.passScore??""}" placeholder="max ${mx}"></div></div>
+<div class="rw" style="margin-top:16px"><button class="btn p" id="pb">${s.resultsPublished?"Update published results":"📣 Publish results"}</button>${s.resultsPublished?'<button class="btn x" id="ub">Unpublish</button>':""}</div></div>
+<div class="card"><h3>Import scores / results</h3><p class="em" style="padding-top:0">For paper exams or manual marking. Columns: <b>ID, Score</b> and optionally <b>Correct, Wrong, Notes</b>. ID is the participant’s login ID or email. Maximum score: <b>${mx}</b>.</p>
+<div class="rw" style="flex-wrap:wrap"><button class="btn" id="it">⬇ Download template</button><input id="icv" type="file" accept=".csv,text/csv" style="flex:1;min-width:180px"></div><label style="display:flex;gap:8px;align-items:center"><input id="iow" type="checkbox"> Overwrite participants who already have a result</label><div id="ip"></div></div>`;
+const upd=async d=>{try{await updateDoc(doc(db,"exam_sessions",s.id),d);Object.assign(CS,d);toast("Saved.");drawSess()}catch(x){toast(errMsg(x))}};
+$("#pb").onclick=()=>{const ps=$("#pp").value===""?null:+$("#pp").value;if(ps!=null&&(isNaN(ps)||ps<0||ps>mx))return toast(`Passing score must be between 0 and ${mx}.`);const R=rowsOf(),open=R.filter(r=>r.x?.status!="submitted").length;
+if((sst(s)!="Finished"||open)&&!confirm(`${sst(s)!="Finished"?"The session hasn’t finished yet. ":""}${open?open+" participant(s) have no submitted result. ":""}Publish anyway?`))return;upd({resultsPublished:true,resultsShow:$("#ps").value,passScore:ps,resultsPublishedAt:Date.now()})};
+$("#ub")&&($("#ub").onclick=()=>confirm("Hide results from participants?")&&upd({resultsPublished:false}));
+$("#it").onclick=()=>dl("cbtnow-results-template.csv",[["ID","Score","Correct","Wrong","Notes"],["pt482913","85","17","3",""],["bima2026","72.5","","","Paper exam"]]);
+const check=()=>{const mxs=maxOf(CPK),by={};partsOf(CS).forEach(u=>{[u.loginId,u.email].filter(Boolean).forEach(k=>by[k.toLowerCase()]=u)});const seen=new Set(),ow=$("#iow").checked;
+IM.forEach(r=>{r.err=r.warn="";const u=by[r.id];r.u=u;if(!r.id)r.err="ID is empty";else if(!u)r.err="Not a participant of this session";else if(seen.has(u.id))r.err="Duplicate in file";else if(isNaN(r.score))r.err="Score is not a number";else if(r.score<0||r.score>mxs)r.err=`Score must be 0–${mxs}`;
+else{seen.add(u.id);const ex=subs.find(b=>b.participantUid==u.id);if(ex&&!ow)r.err="Already has a result (tick overwrite)";else if(ex)r.warn="Will overwrite"}})};
+const prev=()=>{check();const ok=IM.filter(r=>!r.err);$("#ip").innerHTML=IM.length?`<p style="margin:14px 0 8px"><b>${ok.length}</b> ready · <span class="bad">${IM.length-ok.length} skipped</span></p><div class="tw" style="max-height:280px;overflow:auto"><table><thead><tr><th>Row</th><th>ID</th><th>Participant</th><th>Score</th><th>Check</th></tr></thead><tbody>${IM.slice(0,300).map(r=>`<tr><td>${r.line}</td><td class="mono">${esc(r.id)}</td><td>${esc(r.u?.name||"-")}</td><td>${isNaN(r.score)?"-":r.score}</td><td class="${r.err?"bad":r.warn?"wn":"ok"}">${esc(r.err||r.warn||"OK")}</td></tr>`).join("")}</tbody></table></div><button class="btn p w" id="ig" ${ok.length?"":"disabled"}>Import ${ok.length} result(s)</button>`:""};
+$("#iow").onchange=prev;
+$("#icv").onchange=async e=>{const f=e.target.files[0];if(!f)return;const rows=parseCSV(await f.text()),hd=(rows[0]||[]).map(h=>h.trim().toLowerCase()),ix=(...n)=>hd.findIndex(h=>n.includes(h)),c={i:ix("id","login id","username","email"),s:ix("score","points","total"),c:ix("correct"),w:ix("wrong"),n:ix("notes","note")};
+if(rows.length<2||c.i<0||c.s<0){IM=[];$("#ip").innerHTML='<p class="em bad">The file needs a header row with “ID” and “Score”, plus at least one data row.</p>';return}
+IM=rows.slice(1).map((r,k)=>{const g=i=>i<0?"":(r[i]||"").trim(),num=i=>g(i)===""?null:+g(i).replace(",",".");return{line:k+2,id:g(c.i).toLowerCase(),score:g(c.s)===""?NaN:+g(c.s).replace(",","."),c:num(c.c),w:num(c.w),note:g(c.n)}});prev()};
+$("#ip").onclick=async e=>{if(e.target.id!="ig")return;const ok=IM.filter(r=>!r.err);if(!ok.length)return;e.target.disabled=true;
+try{for(let i=0;i<ok.length;i+=400){const bt=writeBatch(db);ok.slice(i,i+400).forEach(r=>{const id=`${CS.id}_${r.u.id}`,ex=subs.find(b=>b.id==id),d={id,sessionId:CS.id,participantUid:r.u.id,participantName:r.u.name,status:"submitted",score:r.score,correctCount:r.c??0,wrongCount:r.w??0,imported:true,manual:false,importNote:r.note,isBlocked:false,finishedAt:Date.now()};
+if(!ex)Object.assign(d,{answers:{},marked:{},startedAt:CS.startTime,timeSpent:0,violationLogs:[],forceSubmit:false,notes:""});bt.set(doc(db,"exam_submissions",id),d,{merge:true})});await bt.commit()}
+toast(`${ok.length} result(s) imported.`);IM=[];$("#ip").innerHTML="";$("#icv").value=""}catch(x){toast(errMsg(x));e.target.disabled=false}}}
+
+// ---------- start ----------
+await route();ready();
+</script></body></html>
