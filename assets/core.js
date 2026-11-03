@@ -51,4 +51,4 @@ export const logoData=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload
 export const NAV={MANAGEMENT:[["dash","🏠","Dashboard","/management/dashboard"],["accounts","👥","Accounts","/management/accounts"],["question","📚","Questions","/management/question"],["exam","🗓","Exams","/management/exam"],["profile","👤","Profile","/management/profile"]]};
 
 // Participant menu (the exam room page is built in a later step: set its href then)
-NAV.PARTICIPANT=[["dash","🏠","Dashboard","/participant/dashboard"],["exam","📝","My exams","/participant/dashboard"],["profile","👤","Profile","/participant/profile"]];
+NAV.PARTICIPANT=[["dash","🏠","Dashboard","/participant/dashboard"],["exam","📝","My exams","/participant/exams"],["profile","👤","Profile","/participant/profile"]];
