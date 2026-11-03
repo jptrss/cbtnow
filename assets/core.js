@@ -3,7 +3,7 @@ import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasej
 import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ===== PASTE YOUR FIREBASE CONFIG HERE (used by every role page) =====
-export const CFG={apiKey:"AIzaSyDHGqit0SiTiIL5Z2Xv28oWueH6sHdTlSw",authDomain:"cbtnow-myown.firebaseapp.com",projectId:"cbtnow-myown",  appId: "1:550333230262:web:f6aca07372fbe950f64a17"};
+export const CFG={apiKey:"AIzaSyDHGqit0SiTiIL5Z2Xv28oWueH6sHdTlSw",authDomain:"cbtnow-myown.firebaseapp.com",projectId:"cbtnow-myown",appId:"1:550333230262:web:f6aca07372fbe950f64a17"};
 // Usernames without "@" become username@USERNAME_DOMAIN (same value as in the login page)
 export const USERNAME_DOMAIN="cbtnow.app";
 // =====================================================================
@@ -48,4 +48,4 @@ let _t="dark";try{_t=localStorage.getItem("cbtnow-theme")||"dark"}catch{}setThem
 export const logoData=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const s=Math.min(1,256/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=Math.round(i.width*s);c.height=Math.round(i.height*s);c.getContext("2d").drawImage(i,0,0,c.width,c.height);ok(c.toDataURL("image/webp",.85))};i.onerror=()=>no(new Error("That file isn't a valid image."));i.src=r.result};r.readAsDataURL(f)});
 
 // ---- Sidebar menus per role. Set href to null for pages not built yet (shows "coming soon"). ----
-export const NAV={MANAGEMENT:[["dash","🏠","Dashboard","/management/dashboard"],["accounts","👥","Accounts","/management/accounts"],["question","📚","Questions",null],["exam","🗓","Exams",null],["profile","👤","Profile","/management/profile"]]};
+export const NAV={MANAGEMENT:[["dash","🏠","Dashboard","/management/dashboard"],["accounts","👥","Accounts","/management/accounts"],["question","📚","Questions","/management/question"],["exam","🗓","Exams",null],["profile","👤","Profile","/management/profile"]]};
