@@ -1,0 +1,100 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard · Participant · CBTNow</title><meta name="robots" content="noindex">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("cbtnow-theme")||"dark"}catch{}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2724%27 fill=%27%236366f1%27/><path d=%27M28 52l16 16 30-34%27 stroke=%27white%27 stroke-width=%2712%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="/assets/theme.css">
+<style>
+.tag.r{color:var(--r);border-color:rgba(248,113,113,.5)}.ok{color:var(--g)}.bad{color:var(--r)}
+.btn.on{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 20%,transparent)}
+.mo .card.wd{width:min(860px,100%)}.it .tx small b{color:var(--tx)}.ac{align-items:center}
+</style></head>
+<body><div class="bgfx"></div><div class="load" id="load"><i></i></div>
+<div class="app"><aside id="side"></aside><main>
+<section class="hero"><div><h1 id="gr"></h1><p id="sub">Participant</p><div class="nx" id="nx"></div></div><div class="clk"><div class="big mono" id="ck"></div><small id="dtx"></small></div></section>
+<div class="stats" id="stats"></div>
+<div class="cols c2">
+<div><div class="card"><h3>My exams</h3><div class="seg" id="ft" style="margin-bottom:8px;flex-wrap:wrap"></div><div id="el"></div></div></div>
+<div><div class="card"><div class="ch"><button id="pv" aria-label="Previous month">‹</button><b id="mt"></b><button id="nt" aria-label="Next month">›</button></div><div class="cg" id="cg"></div>
+<p class="em" style="padding:12px 0 0;font-size:.8rem">Synced with your exam schedule. <span style="color:var(--g)">●</span> live &nbsp;<span style="color:var(--ac)">●</span> upcoming &nbsp;<span style="color:var(--mu)">●</span> finished</p></div>
+<div class="card"><h3 id="dh"></h3><div id="dl"></div></div>
+<div class="card"><h3>My progress</h3><div id="wk"></div></div></div>
+</div></main></div><div class="mo" id="mo"></div><div class="toast" id="toast"></div>
+<script type="module">
+import{$,esc,toast,guard,shell,hero,ready,errMsg,db,NAV}from"/assets/core.js";
+import{collection,doc,getDoc,getDocs,query,where}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const me=await guard("PARTICIPANT");shell(me,NAV.PARTICIPANT,"dash");hero(me);
+$("#sub").textContent="Participant"+(me.institution?" · "+me.institution:"");
+const EXAM_URL=null; // set to "/participant/exam" when the exam room page exists
+
+// ---------- helpers ----------
+const LET="ABCDEFGHIJ",$$=s=>[...document.querySelectorAll(s)];
+const fdt=t=>t?new Date(t).toLocaleString([],{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"-";
+const hm=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+const hms=ms=>{const s=Math.max(0,Math.round(ms/1e3)),d=Math.floor(s/86400);return(d?d+"d ":"")+[Math.floor(s%86400/3600),Math.floor(s/60)%60,s%60].map(n=>String(n).padStart(2,"0")).join(":")};
+const kd=d=>`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+const renderMath=el=>window.renderMathInElement&&renderMathInElement(el,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false},{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false});
+const clean=h=>{const r=new DOMParser().parseFromString(`<div>${h||""}</div>`,"text/html").body.firstChild;r.querySelectorAll("script,style,iframe,object,embed,link,meta,form").forEach(e=>e.remove());r.querySelectorAll("*").forEach(e=>[...e.attributes].forEach(a=>{const n=a.name.toLowerCase(),v=a.value.trim().toLowerCase();if(n.startsWith("on")||(["href","src"].includes(n)&&/^(javascript|data:text|vbscript)/.test(v)))e.removeAttribute(a.name)}));return r.innerHTML};
+const mo=h=>{$("#mo").innerHTML=`<div class="card wd">${h}</div>`;$("#mo").classList.add("show")},cmo=()=>$("#mo").classList.remove("show");
+$("#mo").onclick=e=>{if(e.target.id=="mo"||e.target.closest("[data-x]"))cmo()};
+const has=v=>v!=null&&v!==""&&!(Array.isArray(v)&&!v.length);
+function gradeQ(q,v){if(!has(v))return{pts:0,ok:false,ans:false};
+if(q.type=="short"){const s=String(v).trim(),A=q.answers||[];let ok;if(q.mode=="number"){const n=+s.replace(",",".");ok=!isNaN(n)&&A.some(a=>Math.abs(+String(a).replace(",",".")-n)<=(q.tol||0)+1e-9)}else if(q.mode=="exact")ok=A.some(a=>a.trim()===s);else{const nz=x=>x.trim().toLowerCase().replace(/\s+/g," ");ok=A.some(a=>nz(a)===nz(s))}return{pts:ok?q.score:0,ok,ans:true}}
+if(q.type=="mcq"){const ok=q.correct[0]===+v;return{pts:ok?q.score:0,ok,ans:true}}
+const sel=new Set([].concat(v).map(Number)),cor=new Set(q.correct),r=[...sel].filter(x=>cor.has(x)).length,w=sel.size-r,ok=r==cor.size&&w==0;return{pts:q.scoring=="partial"?+(q.score*Math.max(0,(r-w)/cor.size)).toFixed(2):ok?q.score:0,ok,ans:true}}
+
+// ---------- data ----------
+let S=[],B=[],EVM={},PKM={},FT="now",cy,cm,sel;{const t=new Date();cy=t.getFullYear();cm=t.getMonth();sel=kd(t)}
+const sb=s=>B.find(x=>x.sessionId==s.id);
+const maxS=s=>{const p=PKM[s.packageId];return p?(p.questions||[]).reduce((a,q)=>a+(+q.score||0),0):null};
+function stat(s){const x=sb(s),n=Date.now();if(x?.status=="submitted")return"Completed";if(n>s.endTime)return"Missed";if(n<s.startTime)return"Upcoming";return x?.isBlocked?"Blocked":x?"In progress":"Active"}
+const tcls=k=>({Completed:"g",Active:"g","In progress":"g",Upcoming:"a",Missed:"r",Blocked:"r"}[k]);
+async function load(){try{const[a,b]=await Promise.all([getDocs(query(collection(db,"exam_sessions"),where("assignedParticipantUids","array-contains",me.uid))),getDocs(query(collection(db,"exam_submissions"),where("participantUid","==",me.uid)))]);
+S=a.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>x.startTime-y.startTime);B=b.docs.map(d=>({id:d.id,...d.data()}));
+await Promise.all([...new Set(S.map(s=>s.eventId))].map(async i=>{try{const d=await getDoc(doc(db,"events",i));if(d.exists())EVM[i]=d.data()}catch{}}));
+await Promise.all([...new Set(S.filter(s=>s.resultsPublished&&sb(s)?.status=="submitted").map(s=>s.packageId))].map(async i=>{try{const d=await getDoc(doc(db,"question_packages",i));if(d.exists())PKM[i]=d.data()}catch{}}))}catch(x){toast(errMsg(x))}}
+
+// ---------- render ----------
+function resInfo(s,x){if(x?.status!="submitted")return"";if(!s.resultsPublished)return"<small>Result not published yet</small>";
+const mx=maxS(s),lv=s.resultsShow||"summary",ps=s.passScore!=null?`<span class="tag ${x.score>=s.passScore?"g":"r"}">${x.score>=s.passScore?"Pass":"Fail"}</span>`:"";
+return`<small>Score <b>${x.score}${mx?` / ${mx}`:""}</b> ${ps}${lv!="score"?` · ${x.correctCount??"-"} correct · ${x.wrongCount??"-"} wrong`:""}</small>`}
+const row=s=>{const x=sb(s),k=stat(s),ev=EVM[s.eventId],can=k=="Active"||k=="In progress",rv=x?.status=="submitted"&&s.resultsPublished&&s.resultsShow=="review"&&x.answers&&Object.keys(x.answers).length;
+return`<div class="it"><div class="tx"><b>${esc(s.title)}</b><small>${esc(ev?.title||"Exam")} · ${fdt(s.startTime)} → ${hm(s.endTime)} · ${s.durationMinutes} min</small>${resInfo(s,x)}${k=="Upcoming"?`<small>Opens in <b class="mono" data-op="${s.startTime}">${hms(s.startTime-Date.now())}</b></small>`:""}</div><div class="ac"><span class="tag ${tcls(k)}">${k}</span>${can?`<button class="btn s p" data-a="go" data-id="${s.id}">${x?"Resume":"Start exam"}</button>`:""}${rv?`<button class="btn s" data-a="rv" data-id="${s.id}">Review</button>`:""}</div></div>`};
+function paintStats(){const c=k=>S.filter(s=>stat(s)==k).length,pub=S.filter(s=>s.resultsPublished&&sb(s)?.status=="submitted"&&maxS(s)),av=pub.length?Math.round(pub.reduce((a,s)=>a+sb(s).score/maxS(s)*100,0)/pub.length)+"%":"-";
+$("#stats").innerHTML=[["Upcoming",c("Upcoming")],["Active now",c("Active")+c("In progress")],["Completed",c("Completed")],["Average score",av]].map(([l,v],i)=>`<div class="st" style="animation-delay:${i*60}ms"><b>${v}</b><span>${l}</span></div>`).join("");
+const tot=S.length,dn=c("Completed"),gr=S.filter(s=>s.resultsPublished&&s.passScore!=null&&sb(s)?.status=="submitted"),ps=gr.filter(s=>sb(s).score>=s.passScore).length,pv=pub.length?Math.round(pub.reduce((a,s)=>a+sb(s).score/maxS(s)*100,0)/pub.length):0;
+const bar=(l,t,p)=>`<div style="margin:14px 0"><div style="display:flex;justify-content:space-between;font-size:.86rem"><span>${l}</span><b>${t}</b></div><div class="pb"><i style="width:${p}%"></i></div></div>`;
+$("#wk").innerHTML=bar("Exams completed",`${dn} / ${tot}`,tot?Math.round(dn/tot*100):0)+bar("Average score (published)",pub.length?pv+"%":"-",pv)+bar("Passed",gr.length?`${ps} / ${gr.length}`:"-",gr.length?Math.round(ps/gr.length*100):0)}
+function paintList(){const L=S.filter(s=>{const k=stat(s);return FT=="all"||(FT=="now"?["Active","In progress","Blocked","Upcoming"].includes(k):FT=="done"?k=="Completed":k=="Missed")}),sorted=FT=="now"?L:[...L].reverse();
+$("#ft").innerHTML=[["now","Active & upcoming"],["done","Completed"],["miss","Missed"],["all","All"]].map(([k,l])=>`<button class="btn ${FT==k?"on":""}" data-f="${k}">${l}</button>`).join("");
+$("#el").innerHTML=sorted.map(row).join("")||`<p class="em">${S.length?"Nothing in this list.":"No exams have been assigned to you yet."}</p>`}
+function cal(){const f=new Date(cy,cm,1),days=new Date(cy,cm+1,0).getDate(),off=(f.getDay()+6)%7,by={};S.forEach(s=>(by[kd(new Date(s.startTime))]??=[]).push(s));
+let h="Mon Tue Wed Thu Fri Sat Sun".split(" ").map(d=>`<small>${d}</small>`).join("")+"<i></i>".repeat(off);
+for(let d=1;d<=days;d++){const k=`${cy}-${cm}-${d}`;h+=`<button class="d ${k==kd(new Date())?"t":""} ${k==sel?"s":""}" data-k="${k}">${d}<span>${(by[k]||[]).slice(0,3).map(s=>{const t=stat(s);return`<em style="background:${t=="Upcoming"?"var(--ac)":t=="Active"||t=="In progress"?"var(--g)":"var(--mu)"}"></em>`}).join("")}</span></button>`}
+$("#cg").innerHTML=h;$("#mt").textContent=f.toLocaleString("en",{month:"long",year:"numeric"});
+const[y,m,d]=sel.split("-").map(Number);$("#dh").textContent=new Date(y,m,d).toLocaleDateString("en",{weekday:"long",day:"numeric",month:"long"});$("#dl").innerHTML=(by[sel]||[]).map(row).join("")||'<p class="em">No exams on this day.</p>'}
+const mv=n=>{cm+=n;if(cm<0){cm=11;cy--}if(cm>11){cm=0;cy++}cal()};
+$("#pv").onclick=()=>mv(-1);$("#nt").onclick=()=>mv(1);$("#cg").onclick=e=>{const b=e.target.closest(".d");if(b){sel=b.dataset.k;cal()}};
+$("#ft").onclick=e=>{const b=e.target.closest("[data-f]");if(b){FT=b.dataset.f;paintList()}};
+const act=e=>{const b=e.target.closest("[data-a]");if(!b)return;const s=S.find(x=>x.id==b.dataset.id);if(!s)return;
+if(b.dataset.a=="go")return EXAM_URL?location.href=`${EXAM_URL}#${s.id}`:toast("The exam room opens in the next step.");
+if(b.dataset.a=="rv")review(s)};
+$("#el").onclick=act;$("#dl").onclick=act;
+
+// answer review (only when the organizer published a full review)
+function review(s){const x=sb(s),p=PKM[s.packageId];if(!p)return toast("The review isn’t available.");
+const key=q=>q.type=="short"?esc((q.answers||[]).join(" | ")):q.correct.map(i=>LET[i]).join(", "),at=(q,v)=>!has(v)?"-":q.type=="short"?esc(v):[].concat(v).map(i=>`${LET[i]}. ${esc(q.options[i]?.t||"")}`).join(", ");
+mo(`<h3><span>${esc(s.title)} · review</span><b>${x.score} / ${maxS(s)}</b></h3><div style="max-height:62vh;overflow:auto">${p.questions.map((q,i)=>{const v=(x.answers||{})[q.id],g=gradeQ(q,v);return`<div class="card" style="margin:8px 0;padding:12px"><div class="rw"><b>${i+1}.</b><span class="tag ${!g.ans?"":g.ok?"g":"r"}">${!g.ans?"Unanswered":g.ok?"Correct":g.pts>0?"Partial":"Wrong"}</span><span style="color:var(--mu);font-size:.85rem">${g.pts} / ${q.score} pt</span></div><div style="margin:6px 0">${clean(q.text)}</div><div style="color:var(--mu);font-size:.88rem">Your answer: <b style="color:var(--tx)">${at(q,v)}</b> · Correct: <b class="ok">${key(q)}</b></div></div>`}).join("")}</div><div class="rw" style="margin-top:12px"><button class="btn" data-x style="flex:1">Close</button></div>`);renderMath($("#mo"))}
+
+// ---------- live bits ----------
+const sig=()=>S.map(stat).join();let last="";
+setInterval(()=>{const n=Date.now(),nx=S.find(s=>["Active","In progress","Upcoming"].includes(stat(s))),b=$("#nx");
+if(nx){const live=n>=nx.startTime;b.classList.add("show");b.innerHTML=`<span>⏱</span><span><b>${live?"Live now":"Next exam"}:</b> ${esc(nx.title)} <span class="mono" style="color:var(--ac)">${live?"ends in "+hms(nx.endTime-n):"starts in "+hms(nx.startTime-n)}</span></span>`}else b.classList.remove("show");
+$$("[data-op]").forEach(el=>el.textContent=hms(+el.dataset.op-n));const g=sig();if(g!=last){last=g;paintStats();paintList();cal()}},1000);
+
+await load();last=sig();paintStats();paintList();cal();ready();
+</script></body></html>
