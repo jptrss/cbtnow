@@ -49,3 +49,6 @@ export const logoData=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload
 
 // ---- Sidebar menus per role. Set href to null for pages not built yet (shows "coming soon"). ----
 export const NAV={MANAGEMENT:[["dash","🏠","Dashboard","/management/dashboard"],["accounts","👥","Accounts","/management/accounts"],["question","📚","Questions","/management/question"],["exam","🗓","Exams","/management/exam"],["profile","👤","Profile","/management/profile"]]};
+
+// Participant menu (the exam room page is built in a later step: set its href then)
+NAV.PARTICIPANT=[["dash","🏠","Dashboard","/participant/dashboard"],["exam","📝","My exams",null],["profile","👤","Profile","/participant/profile"]];
