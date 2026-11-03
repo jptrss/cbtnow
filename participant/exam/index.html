@@ -1,0 +1,148 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exam · CBTNow</title><meta name="robots" content="noindex">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("cbtnow-theme")||"dark"}catch{}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2724%27 fill=%27%236366f1%27/><path d=%27M28 52l16 16 30-34%27 stroke=%27white%27 stroke-width=%2712%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="/assets/theme.css">
+<style>
+:root{--ac:#34d399}
+input[type=checkbox],input[type=radio]{width:auto;padding:0;margin:0;accent-color:var(--ac)}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 60px}
+.pre{max-width:720px;margin:6vh auto;padding:30px}.pre h1{font-size:clamp(1.6rem,4vw,2.2rem);margin:8px 0}
+.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:18px 0}.mg div{padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--card)}.mg b{display:block;font:700 1.3rem "Space Grotesk"}.mg span{color:var(--mu);font-size:.8rem}
+.cdb{text-align:center;padding:16px;margin:8px 0 14px;border-radius:16px;border:1px dashed var(--ac);background:color-mix(in srgb,var(--ac) 10%,transparent);font:700 1.9rem "JetBrains Mono"}
+.pre ul{margin:6px 0 20px 20px;color:var(--mu);font-size:.92rem}.pre li{margin:5px 0}
+.ag{display:flex;gap:10px;align-items:flex-start;color:var(--tx);font-size:.88rem;margin:16px 0;line-height:1.5}.ag input{margin-top:3px}
+.tb2{position:sticky;top:0;z-index:20;display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--line);background:rgba(6,9,24,.88);backdrop-filter:blur(14px)}
+[data-theme=light] .tb2{background:rgba(255,255,255,.92)}.tb2 h2{font-size:1.05rem;flex:1;min-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tm{font:700 1.4rem "JetBrains Mono";padding:4px 14px;border-radius:12px;border:1px solid var(--line)}.tm.low{color:var(--r);border-color:var(--r);animation:bl 1s infinite}@keyframes bl{50%{opacity:.55}}
+.rm{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px;align-items:start}@media(max-width:900px){.rm{grid-template-columns:1fr}}
+.qt{font-size:1.06rem;line-height:1.75;margin:12px 0 18px;overflow-wrap:anywhere}.qt img{max-width:100%;border-radius:10px}
+.opt{display:flex;gap:12px;align-items:center;padding:13px 14px;border:1px solid var(--line);border-radius:14px;margin:9px 0;cursor:pointer;transition:.15s;background:var(--card)}
+.opt:hover{border-color:var(--ac)}.opt.on{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 16%,transparent)}.opt>b{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;background:var(--line);font-size:.8rem;flex:none}.opt.on>b{background:var(--ac);color:#04210f}.opt img{max-height:160px;max-width:100%;border-radius:8px;margin-top:6px;display:block}
+.nums{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:12px 0}.nums button{aspect-ratio:1;padding:0;border-radius:10px;border:1px solid var(--line);background:rgba(143,152,201,.28);color:var(--tx);font:600 .85rem Inter;cursor:pointer}
+.nums .a{background:var(--g);color:#04210f;border:0}.nums .m{background:var(--y);color:#2b1d00;border:0}.nums .c{outline:3px solid var(--ac);outline-offset:1px}
+.lg2{display:flex;gap:12px;flex-wrap:wrap;font-size:.76rem;color:var(--mu)}.lg2 i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.ex{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}.ex input[type=text]{user-select:text;-webkit-user-select:text}
+.ov{position:fixed;inset:0;z-index:100;background:rgba(6,9,24,.97);color:#e8ebff;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:10px}.ov h2{font-size:clamp(1.4rem,4vw,2rem);max-width:640px}.ov .ic{font-size:3rem}
+.ov .big{font-size:4rem;color:var(--r)}
+.chipv{padding:4px 12px;border-radius:99px;border:1px solid var(--line);font-size:.82rem;color:var(--mu)}.chipv.w{color:var(--r);border-color:rgba(248,113,113,.5)}
+</style></head>
+<body><div class="bgfx"></div><div class="load" id="load"><i></i></div>
+<div id="root"></div><div class="mo" id="mo"></div><div class="toast" id="toast"></div>
+<div class="ov" id="lk"><div class="ic">⚠️</div><h2>Violation Detected! Examination paused for 1 minute.</h2><p id="lt" style="color:#8f98c9"></p><div class="big mono" id="lc"></div><small style="color:#8f98c9">Your exam timer keeps running. Every violation is reported to your proctor.</small></div>
+<div class="ov" id="bk"><div class="ic">⛔</div><h2>You have been blocked by the proctor.</h2><p style="color:#8f98c9">Please wait. Your proctor will unblock you or contact you. Your timer keeps running.</p></div>
+
+<script type="module">
+import{$,esc,toast,guard,errMsg,ready,db}from"/assets/core.js";
+import{doc,getDoc,setDoc,updateDoc,onSnapshot,arrayUnion}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const me=await guard("PARTICIPANT"),sid=decodeURIComponent(location.hash.slice(1)),BACK="/participant/dashboard",LET="ABCDEFGHIJ",$$=s=>[...document.querySelectorAll(s)];
+let S,PK,SUB,X=null,pt=null;
+
+// ---------- helpers ----------
+const fdt=t=>new Date(t).toLocaleString([],{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const hms=ms=>{const s=Math.max(0,Math.ceil(ms/1e3)),d=Math.floor(s/86400);return(d?d+"d ":"")+[Math.floor(s%86400/3600),Math.floor(s/60)%60,s%60].map(n=>String(n).padStart(2,"0")).join(":")};
+const renderMath=el=>window.renderMathInElement&&renderMathInElement(el,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false},{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false});
+const clean=h=>{const r=new DOMParser().parseFromString(`<div>${h||""}</div>`,"text/html").body.firstChild;r.querySelectorAll("script,style,iframe,object,embed,link,meta,form").forEach(e=>e.remove());r.querySelectorAll("*").forEach(e=>[...e.attributes].forEach(a=>{const n=a.name.toLowerCase(),v=a.value.trim().toLowerCase();if(n.startsWith("on")||(["href","src"].includes(n)&&/^(javascript|data:text|vbscript)/.test(v)))e.removeAttribute(a.name)}));return r.innerHTML};
+const mo=h=>{$("#mo").innerHTML=`<div class="card">${h}</div>`;$("#mo").classList.add("show")},cmo=()=>$("#mo").classList.remove("show");
+$("#mo").onclick=e=>{if(e.target.closest("[data-x]"))cmo()};  // no backdrop-close: avoids accidental dismissal
+const has=v=>v!=null&&v!==""&&!(Array.isArray(v)&&!v.length);
+const hash=s=>{let h=1779033703^s.length;for(let i=0;i<s.length;i++){h=Math.imul(h^s.charCodeAt(i),3432918353);h=h<<13|h>>>19}h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return(h^=h>>>16)>>>0};
+const rnd=a=>()=>{a=a+1831565813|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const shuf=(a,r)=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function gradeQ(q,v){if(!has(v))return{pts:0,ok:false,ans:false};
+if(q.type=="short"){const s=String(v).trim(),A=q.answers||[];let ok;if(q.mode=="number"){const n=+s.replace(",",".");ok=!isNaN(n)&&A.some(a=>Math.abs(+String(a).replace(",",".")-n)<=(q.tol||0)+1e-9)}else if(q.mode=="exact")ok=A.some(a=>a.trim()===s);else{const nz=x=>x.trim().toLowerCase().replace(/\s+/g," ");ok=A.some(a=>nz(a)===nz(s))}return{pts:ok?q.score:0,ok,ans:true}}
+if(q.type=="mcq"){const ok=q.correct[0]===+v;return{pts:ok?q.score:0,ok,ans:true}}
+const sel=new Set([].concat(v).map(Number)),cor=new Set(q.correct),r=[...sel].filter(x=>cor.has(x)).length,w=sel.size-r,ok=r==cor.size&&w==0;return{pts:q.scoring=="partial"?+(q.score*Math.max(0,(r-w)/cor.size)).toFixed(2):ok?q.score:0,ok,ans:true}}
+function grade(qs,a){let score=0,correct=0,wrong=0;qs.forEach(q=>{const g=gradeQ(q,(a||{})[q.id]);score+=g.pts;if(g.ans){g.ok?correct++:wrong++}});return{score:+score.toFixed(2),correct,wrong}}
+const deadline=st=>Math.min(st+S.durationMinutes*6e4,S.endTime),ref=()=>doc(db,"exam_submissions",`${S.id}_${me.uid}`),R=()=>S.violationRules||{tab:true,copy:true,shot:true};
+const maxPts=()=>PK.questions.reduce((a,q)=>a+(+q.score||0),0);
+
+// ---------- screens ----------
+const screen=h=>{$("#root").innerHTML=h;renderMath($("#root"))};
+const err=(t,m)=>{screen(`<div class="card pre"><h1>${esc(t)}</h1><p class="em">${esc(m||"")}</p><a class="btn p" href="${BACK}">← Back to dashboard</a></div>`);ready()};
+async function init(){
+if(!sid)return err("No exam selected","Open an exam from your dashboard.");
+try{const s=await getDoc(doc(db,"exam_sessions",sid));if(!s.exists()||!(s.data().assignedParticipantUids||[]).includes(me.uid))return err("Exam not available","This exam doesn’t exist or isn’t assigned to you.");S={id:s.id,...s.data()};
+const p=await getDoc(doc(db,"question_packages",S.packageId));if(!p.exists()||!(p.data().questions||[]).length)return err("Exam not ready","The questions for this exam aren’t available yet. Contact your organizer.");PK=p.data();
+const x=await getDoc(ref());SUB=x.exists()?x.data():null}catch(e){return err("Couldn’t load the exam",errMsg(e))}
+if(SUB?.status=="submitted")return done(SUB,true);
+if(SUB&&Date.now()>=deadline(SUB.startedAt)){screen('<div class="card pre"><h1>Submitting your answers…</h1><p class="em">Your time is over. Saving your saved answers now.</p></div>');ready();const r=await doSubmit(SUB.answers||{},SUB.marked||{},SUB.startedAt);return r?done({...SUB,...r.d},false):err("Couldn’t submit","Check your connection and reload this page.")}
+pre();ready()}
+
+// pre-start page: countdown, rules, token modal, integrity agreement
+function pre(){const r=R(),n=PK.questions.length,blocked=SUB?.isBlocked;
+screen(`<div class="card pre"><span class="chipv">📝 ${SUB?"Exam in progress, resume":"Exam"}</span><h1>${esc(S.title)}</h1><p class="em" style="padding:0">${esc(S.description||"")}</p>
+<div class="mg"><div><b>${S.durationMinutes} min</b><span>Duration</span></div><div><b>${n}</b><span>Questions</span></div><div><b>${maxPts()}</b><span>Total points</span></div><div><b>${fdt(S.endTime)}</b><span>Hard end time</span></div></div>
+<div class="cdb" id="cd"></div>
+<h3>Before you start</h3><ul><li>Your timer is personal (${S.durationMinutes} minutes) but the exam always closes at ${fdt(S.endTime)}. It is submitted automatically when time is up.</li><li>Answers are saved automatically. If you reload, you can resume, and the timer keeps running.</li>
+${r.tab?"<li>Do not switch tabs or apps, and keep this window focused.</li>":""}${r.copy?"<li>Copying, pasting, right-click and text selection are disabled.</li>":""}${r.shot?"<li>Screenshot keys are blocked and recorded.</li>":""}<li>Every violation <b>pauses your exam for 1 minute</b> and is reported to your proctor with the exact time.</li></ul>
+${blocked?'<p class="bad" style="color:var(--r)">You are currently blocked by the proctor.</p>':""}
+<div class="rw"><a class="btn" href="${BACK}">← Back</a><button class="btn p" id="go" style="flex:1">🔑 Enter token &amp; start</button></div></div>`);
+const ph=()=>Date.now()<S.startTime?0:Date.now()>S.endTime?2:1,upd=()=>{const c=$("#cd"),b=$("#go");if(!c){clearInterval(pt);return}const p=ph(),n=Date.now();
+c.textContent=p==0?"Starts in "+hms(S.startTime-n):p==1?"Open · closes in "+hms(S.endTime-n):"This exam has ended";c.style.borderColor=p==1?"var(--g)":"var(--line)";b.disabled=p!=1||!!blocked};
+upd();clearInterval(pt);pt=setInterval(upd,500);$("#go").onclick=tokenModal}
+function tokenModal(){mo(`<h3>Enter your exam token</h3><p class="em" style="padding-top:0">Your proctor will give you the token.</p><input id="tk" class="mono" autocomplete="off" placeholder="TOKEN" style="text-transform:uppercase;font-size:1.3rem;letter-spacing:.25em;text-align:center">
+<label class="ag"><input type="checkbox" id="ag"><span>I agree to uphold exam integrity. I understand that leaving this page, copying or pasting, and taking screenshots are recorded, pause my exam for 1 minute, and are visible to my proctors.</span></label>
+<div class="rw"><button class="btn" data-x style="flex:1">Cancel</button><button class="btn p" id="bg" style="flex:1">Begin exam</button></div>`);$("#tk").focus();$("#tk").onkeydown=e=>{if(e.key=="Enter")$("#bg").click()};
+$("#bg").onclick=async()=>{const t=$("#tk").value.trim().toUpperCase();if(Date.now()<S.startTime||Date.now()>S.endTime)return toast("The exam isn’t open right now.");if(!t)return toast("Enter the token.");if(t!==String(S.token).toUpperCase())return toast("Invalid token.");if(!$("#ag").checked)return toast("You must accept the integrity agreement.");
+$("#bg").disabled=true;try{if(!SUB){const n=Date.now(),x={id:ref().id,sessionId:S.id,participantUid:me.uid,participantName:me.name,answers:{},marked:{},status:"in_progress",startedAt:n,violationLogs:[],isBlocked:false,forceSubmit:false,notes:""};await setDoc(ref(),x);SUB=x}
+clearInterval(pt);cmo();room()}catch(e){toast(errMsg(e));$("#bg").disabled=false}}}
+
+// ---------- exam workspace ----------
+function room(){let qs=PK.questions.map(q=>({...q,ord:q.type=="short"?[]:PK.shuffleOptions?shuf(q.options.map((_,i)=>i),rnd(hash(me.uid+S.id+q.id))):q.options.map((_,i)=>i)}));if(PK.shuffleQuestions)qs=shuf(qs,rnd(hash(me.uid+"|"+S.id)));
+X={qs,i:0,ans:{...(SUB.answers||{})},mk:{...(SUB.marked||{})},dl:deadline(SUB.startedAt),lockEnd:0,lv:0,done:false,vc:(SUB.violationLogs||[]).length,t:null};
+document.body.classList.add("ex");Object.entries(H).forEach(([k,f])=>addEventListener(k,f,true));addEventListener("beforeunload",bu);
+X.unsub=onSnapshot(ref(),d=>{const x=d.data();if(!x||X?.done)return;$("#bk").style.display=x.isBlocked?"flex":"none";if(x.status=="submitted")remote(x)},()=>{});
+screen(`<header class="tb2"><h2>${esc(S.title)}</h2><span class="chipv" id="pr"></span><span class="chipv w" title="Recorded violations">⚠ <span id="vc">${X.vc}</span></span><span class="tm mono" id="tm"></span><button class="btn p" data-a="sub">Submit exam</button></header>
+<div class="wrap"><div class="rm"><div class="card" id="qp"></div><div class="card"><b>Questions</b><div class="nums" id="nums"></div><div class="lg2"><span><i style="background:var(--g)"></i>Answered</span><span><i style="background:var(--y)"></i>Review</span><span><i style="background:rgba(143,152,201,.5)"></i>Unanswered</span></div></div></div></div>`);
+drawQ();X.t=setInterval(tick,500);tick()}
+function drawQ(){const q=X.qs[X.i],n=X.qs.length,a=X.ans[q.id],on=o=>q.type=="mcq"?a===o:(a||[]).includes(o);
+$("#qp").innerHTML=`<div class="rw"><b style="font-size:1.1rem">Question ${X.i+1} <span style="color:var(--mu);font-weight:400">of ${n}</span></b><span class="tag a">${q.score} pt</span><span class="tag">${q.type=="mcq"?"Choose one":q.type=="complex"?"Choose all that apply":"Short answer"}</span>${X.mk[q.id]?'<span class="tag" style="color:var(--y)">Marked for review</span>':""}</div>
+<div class="qt">${clean(q.text)}</div>${q.type=="short"?`<input type="text" id="sa" autocomplete="off" spellcheck="false" placeholder="Type your answer" value="${esc(a??"")}" style="font-size:1.1rem">`:q.ord.map((o,k)=>`<label class="opt ${on(o)?"on":""}"><input type="${q.type=="mcq"?"radio":"checkbox"}" name="o" data-o="${o}" ${on(o)?"checked":""}><b>${LET[k]}</b><span>${esc(q.options[o].t)}${q.options[o].img?`<img src="${esc(q.options[o].img)}" alt="">`:""}</span></label>`).join("")}
+<div class="rw" style="margin-top:20px"><button class="btn" data-a="prev" ${X.i?"":"disabled"}>← Previous</button><button class="btn" data-a="mark" style="border-color:var(--y);color:var(--y)">${X.mk[q.id]?"Unmark review":"⚑ Mark for review"}</button><span style="flex:1"></span><button class="btn p" data-a="next" ${X.i<n-1?"":"disabled"}>Next →</button></div>`;
+renderMath($("#qp"));grid()}
+function grid(){$("#nums").innerHTML=X.qs.map((q,k)=>`<button class="${X.mk[q.id]?"m":has(X.ans[q.id])?"a":""} ${k==X.i?"c":""}" data-g="${k}" title="${X.mk[q.id]&&has(X.ans[q.id])?"Answered · marked for review":""}">${k+1}</button>`).join("");
+$("#pr").textContent=`${X.qs.filter(q=>has(X.ans[q.id])).length} / ${X.qs.length} answered`}
+const save=()=>{clearTimeout(X.s);X.s=setTimeout(()=>updateDoc(ref(),{answers:X.ans,marked:X.mk}).catch(()=>{}),700)};
+document.addEventListener("change",e=>{if(!X||X.done)return;const t=e.target,q=X.qs[X.i];if(t.dataset.o===undefined)return;const o=+t.dataset.o;
+if(q.type=="mcq")X.ans[q.id]=o;else{const s=new Set(X.ans[q.id]||[]);t.checked?s.add(o):s.delete(o);X.ans[q.id]=[...s].sort((a,b)=>a-b);if(!X.ans[q.id].length)delete X.ans[q.id]}
+$$("#qp .opt").forEach(l=>l.classList.toggle("on",l.querySelector("input").checked));save();grid()});
+document.addEventListener("input",e=>{if(!X||X.done||e.target.id!="sa")return;const q=X.qs[X.i];e.target.value.trim()?X.ans[q.id]=e.target.value:delete X.ans[q.id];save();grid()});
+document.addEventListener("click",e=>{if(!X||X.done)return;const g=e.target.closest("[data-g]");if(g){X.i=+g.dataset.g;return drawQ()}const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,q=X.qs[X.i];
+if(a=="prev"&&X.i>0){X.i--;drawQ()}if(a=="next"&&X.i<X.qs.length-1){X.i++;drawQ()}if(a=="mark"){X.mk[q.id]?delete X.mk[q.id]:X.mk[q.id]=true;save();drawQ()}
+if(a=="sub"){const an=X.qs.filter(q=>has(X.ans[q.id])).length,mk=X.qs.filter(q=>X.mk[q.id]).length,un=X.qs.length-an;
+mo(`<h3>Submit exam?</h3><div class="mg"><div><b>${an}</b><span>Answered</span></div><div><b style="color:${un?"var(--r)":"inherit"}">${un}</b><span>Unanswered</span></div><div><b>${mk}</b><span>Marked for review</span></div></div><p class="em" style="padding:0 0 12px">You can’t change your answers after submitting.</p><div class="rw"><button class="btn" data-x style="flex:1">Keep working</button><button class="btn p" data-a="fin" style="flex:1">Yes, submit</button></div>`)}
+if(a=="fin"){cmo();finish(false)}});
+function tick(){if(!X||X.done)return;const l=X.dl-Date.now();if(l<=0)return finish(true);const t=$("#tm");t.textContent=hms(l);t.classList.toggle("low",l<=3e5);
+if(X.lockEnd){const r=Math.ceil((X.lockEnd-Date.now())/1e3),lk=$("#lk");if(r<=0){X.lockEnd=0;lk.style.display="none"}else{lk.style.display="flex";$("#lc").textContent=r}}}
+
+// ---------- proctoring ----------
+const pv=c=>e=>{e.preventDefault();viol(c,e.type=="contextmenu"?"Right-click attempt":"Clipboard: "+e.type)};
+const H={visibilitychange:()=>document.hidden&&viol("tab","Tab switch / app hidden"),blur:()=>viol("tab","Window lost focus"),copy:pv("copy"),cut:pv("copy"),paste:pv("copy"),contextmenu:pv("copy"),dragstart:e=>e.preventDefault(),
+keyup:e=>{if(e.key=="PrintScreen"){navigator.clipboard?.writeText("").catch(()=>{});viol("shot","PrintScreen pressed")}},
+keydown:e=>{const k=e.key.toLowerCase(),m=e.ctrlKey||e.metaKey;if(m&&e.shiftKey&&k=="s"){e.preventDefault();return viol("shot","Screenshot shortcut")}if(m&&["c","v","x","p","s","u"].includes(k)){e.preventDefault();viol("copy","Blocked shortcut: "+k.toUpperCase())}}};
+function viol(cat,t){if(!X||X.done||Date.now()-X.lv<1500)return;X.lv=Date.now();if(!R()[cat])return;X.vc++;$("#vc").textContent=X.vc;
+updateDoc(ref(),{violationLogs:arrayUnion({type:t,at:Date.now()})}).catch(()=>{});$("#lt").textContent=`Violation ${X.vc}: ${t}`;document.activeElement?.blur?.();if(!X.lockEnd)X.lockEnd=Date.now()+6e4;tick()}
+const bu=e=>{if(X&&!X.done){e.preventDefault();e.returnValue=""}};
+
+// ---------- finishing ----------
+function stopRoom(){if(!X)return;X.done=true;clearInterval(X.t);clearTimeout(X.s);X.unsub&&X.unsub();Object.entries(H).forEach(([k,f])=>removeEventListener(k,f,true));removeEventListener("beforeunload",bu);document.body.classList.remove("ex");["#lk","#bk"].forEach(s=>$(s).style.display="none");cmo()}
+async function doSubmit(ans,mk,start){const g=grade(PK.questions,ans),n=Date.now(),d={answers:ans,marked:mk,status:"submitted",score:g.score,correctCount:g.correct,wrongCount:g.wrong,timeSpent:n-start,finishedAt:n};
+for(let i=0;i<4;i++){try{await updateDoc(ref(),d);return{d}}catch(e){await new Promise(r=>setTimeout(r,1500))}}return null}
+async function finish(auto){if(!X||X.done)return;const ans=X.ans,mk=X.mk,st=SUB.startedAt;stopRoom();
+screen(`<div class="card pre"><h1>Submitting…</h1><p class="em">${auto?"Time is up. ":""}Saving your answers. Please don’t close this page.</p></div>`);
+const r=await doSubmit(ans,mk,st);if(r)return done({...SUB,...r.d},false,auto);
+screen(`<div class="card pre"><h1>Couldn’t submit</h1><p class="em">We couldn’t reach the server. Your answers are saved on this page. Check your connection and try again.</p><button class="btn p" id="rt">Try again</button></div>`);$("#rt").onclick=async()=>{const r=await doSubmit(ans,mk,st);r?done({...SUB,...r.d},false,auto):toast("Still can’t reach the server.")}}
+function remote(x){const ans=x.answers||X.ans;stopRoom();done({...SUB,...x,answers:ans},false,false,true)}
+function done(x,already,auto,byStaff){const an=PK.questions.filter(q=>has((x.answers||{})[q.id])).length;
+screen(`<div class="card pre" style="text-align:center"><div style="font-size:3rem">✅</div><h1>${already?"You have already completed this exam":"Exam submitted"}</h1><p class="em">${byStaff?"Your exam was submitted by your proctor. ":auto?"Time ran out, so your exam was submitted automatically. ":""}Your answers were recorded${S.resultsPublished?"":". Your result will appear on your dashboard once your organizer publishes it"}.</p>
+<div class="mg"><div><b>${an} / ${PK.questions.length}</b><span>Answered</span></div><div><b>${x.timeSpent?Math.max(1,Math.round(x.timeSpent/6e4))+" min":"-"}</b><span>Time used</span></div><div><b>${(x.violationLogs||[]).length}</b><span>Violations recorded</span></div></div>
+<a class="btn p" href="${BACK}">Back to dashboard</a></div>`);ready()}
+addEventListener("hashchange",()=>{if(!X)location.reload()});
+await init();
+</script></body></html>
