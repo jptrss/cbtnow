@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard · Proctor · CBTNow</title><meta name="robots" content="noindex">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("cbtnow-theme")||"dark"}catch{}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2724%27 fill=%27%236366f1%27/><path d=%27M28 52l16 16 30-34%27 stroke=%27white%27 stroke-width=%2712%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="/assets/theme.css">
+<style>.tag.r{color:var(--r);border-color:rgba(248,113,113,.5)}.mt{color:var(--mu);font-size:.85rem}.live{border-color:color-mix(in srgb,var(--g) 55%,transparent)!important}.mini{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0}.mini div{font-size:.8rem;color:var(--mu)}.mini b{display:block;font:700 1.2rem "Space Grotesk";color:var(--tx)}.fd.w span{color:var(--r)}</style></head>
+<body><div class="bgfx"></div><div class="load" id="load"><i></i></div>
+<div class="app"><aside id="side"></aside><main>
+<section class="hero"><div><h1 id="gr"></h1><p>Proctor · Exam invigilator</p><div class="nx" id="nx"></div></div><div class="clk"><div class="big mono" id="ck"></div><small id="dtx"></small></div></section>
+<div class="stats" id="stats"></div>
+<div class="cols c2">
+<div><div class="card"><div class="ch"><button id="pv" aria-label="Previous month">‹</button><b id="mt"></b><button id="nt" aria-label="Next month">›</button></div><div class="cg" id="cg"></div>
+<p class="em" style="padding:12px 0 0;font-size:.8rem">Synced with the sessions assigned to you. <span style="color:var(--g)">●</span> live &nbsp;<span style="color:var(--ac)">●</span> upcoming &nbsp;<span style="color:var(--mu)">●</span> finished</p></div>
+<div class="card"><h3 id="dh"></h3><div id="dl"></div></div></div>
+<div><div class="card"><h3>Live now</h3><div id="lv"></div></div>
+<div class="card"><h3>Latest violations</h3><div id="vf"></div></div>
+<div class="card"><h3>Work summary</h3><div id="wk"></div></div></div>
+</div></main></div><div class="toast" id="toast"></div>
+<script type="module">
+import{$,esc,toast,guard,shell,hero,ready,errMsg,db,NAV}from"/assets/core.js";
+import{collection,doc,getDoc,getDocs,query,where,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const me=await guard("PROCTOR");shell(me,NAV.PROCTOR,"dash");hero(me);
+const $$=s=>[...document.querySelectorAll(s)],kd=d=>`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+const hm=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),fdt=t=>new Date(t).toLocaleString([],{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const hms=ms=>{const s=Math.max(0,Math.round(ms/1e3)),d=Math.floor(s/86400);return(d?d+"d ":"")+[Math.floor(s%86400/3600),Math.floor(s/60)%60,s%60].map(n=>String(n).padStart(2,"0")).join(":")};
+const ago=t=>{const m=Math.round((Date.now()-(t||0))/6e4);return m<1?"just now":m<60?m+" min ago":m<1440?Math.round(m/60)+" h ago":Math.round(m/1440)+" d ago"};
+const stt=s=>{const n=Date.now();return n<s.startTime?"Upcoming":n>s.endTime?"Finished":"Live"};
+let S=[],EVM={},subs=[],unsub=null,key="",cy,cm,sel;{const t=new Date();cy=t.getFullYear();cm=t.getMonth();sel=kd(t)}
+async function load(){try{S=(await getDocs(query(collection(db,"exam_sessions"),where("assignedProctorUids","array-contains",me.uid)))).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.startTime-b.startTime);
+await Promise.all([...new Set(S.map(s=>s.eventId))].map(async i=>{try{const d=await getDoc(doc(db,"events",i));if(d.exists())EVM[i]=d.data()}catch{}}))}catch(x){toast(errMsg(x))}}
+const watch=s=>stt(s)=="Live"||(Date.now()>s.endTime&&Date.now()-s.endTime<216e5);
+function listen(){const ids=S.filter(watch).map(s=>s.id).slice(0,30),k=ids.join();if(k==key)return;key=k;unsub&&unsub();subs=[];if(!ids.length){paint();return}
+unsub=onSnapshot(query(collection(db,"exam_submissions"),where("sessionId","in",ids)),q=>{subs=q.docs.map(d=>({id:d.id,...d.data()}));paint()},x=>toast(errMsg(x)))}
+const row=s=>{const x=stt(s);return`<div class="it"><div class="tx"><b>${esc(s.title)}</b><small>${esc(EVM[s.eventId]?.title||"Exam")} · ${hm(s.startTime)}–${hm(s.endTime)} · ${(s.assignedParticipantUids||[]).length} participants</small></div><div class="ac"><span class="tag ${x=="Live"?"g":x=="Upcoming"?"a":""}">${x}</span><a class="btn s" href="/proctor/exams#/session/${s.id}">Monitor</a></div></div>`};
+function paint(){const live=S.filter(s=>stt(s)=="Live"),ls=subs.filter(x=>live.some(s=>s.id==x.sessionId)),prog=ls.filter(x=>x.status!="submitted").length,vi=ls.reduce((a,x)=>a+(x.violationLogs||[]).length,0),done=S.filter(s=>stt(s)=="Finished").length;
+$("#stats").innerHTML=[["Assigned sessions",S.length],["Live now",live.length],["Upcoming",S.filter(s=>stt(s)=="Upcoming").length],["Finished",done],["Taking the exam",prog],["Violations (live)",vi]].map(([l,v],i)=>`<div class="st" style="animation-delay:${i*60}ms"><b>${v}</b><span>${l}</span></div>`).join("");
+$("#lv").innerHTML=live.map(s=>{const x=subs.filter(b=>b.sessionId==s.id),n=(s.assignedParticipantUids||[]).length;return`<div class="card live" style="margin:0 0 10px;padding:14px"><div class="rw"><b>${esc(s.title)}</b><span class="tag g">Live</span><span class="mt" id="e${s.id}" data-e="${s.endTime}"></span></div><div class="mini"><div><b>${n}</b>enrolled</div><div><b>${x.filter(b=>b.status!="submitted"&&!b.isBlocked).length}</b>in progress</div><div><b>${x.filter(b=>b.status=="submitted").length}</b>submitted</div><div><b>${x.filter(b=>b.isBlocked).length}</b>blocked</div><div><b>${x.reduce((a,b)=>a+(b.violationLogs||[]).length,0)}</b>violations</div></div><a class="btn s p" href="/proctor/exams#/session/${s.id}">Open live monitor</a></div>`}).join("")||'<p class="em">No session is live right now.</p>';
+const title=Object.fromEntries(S.map(s=>[s.id,s.title])),lg=subs.flatMap(x=>(x.violationLogs||[]).map(v=>({...v,n:x.participantName,s:title[x.sessionId]}))).sort((a,b)=>b.at-a.at).slice(0,8);
+$("#vf").innerHTML=lg.map(v=>`<div class="fd w"><span>${esc(v.n)}: ${esc(v.type)} <small style="color:var(--mu)">· ${esc(v.s||"")}</small></span><small>${ago(v.at)}</small></div>`).join("")||'<p class="em">No violations recorded.</p>';
+const bar=(l,a,b)=>`<div style="margin:14px 0"><div style="display:flex;justify-content:space-between;font-size:.86rem"><span>${l}</span><b>${a} / ${b}</b></div><div class="pb"><i style="width:${b?Math.round(a/b*100):0}%"></i></div></div>`;
+const en=live.reduce((a,s)=>a+(s.assignedParticipantUids||[]).length,0);$("#wk").innerHTML=bar("Sessions finished",done,S.length)+bar("Participants submitted (live sessions)",ls.filter(x=>x.status=="submitted").length,en);cal()}
+function cal(){const f=new Date(cy,cm,1),days=new Date(cy,cm+1,0).getDate(),off=(f.getDay()+6)%7,by={};S.forEach(s=>(by[kd(new Date(s.startTime))]??=[]).push(s));
+let h="Mon Tue Wed Thu Fri Sat Sun".split(" ").map(d=>`<small>${d}</small>`).join("")+"<i></i>".repeat(off);
+for(let d=1;d<=days;d++){const k=`${cy}-${cm}-${d}`;h+=`<button class="d ${k==kd(new Date())?"t":""} ${k==sel?"s":""}" data-k="${k}">${d}<span>${(by[k]||[]).slice(0,3).map(s=>`<em style="background:${{Live:"var(--g)",Upcoming:"var(--ac)",Finished:"var(--mu)"}[stt(s)]}"></em>`).join("")}</span></button>`}
+$("#cg").innerHTML=h;$("#mt").textContent=f.toLocaleString("en",{month:"long",year:"numeric"});const[y,m,d]=sel.split("-").map(Number);$("#dh").textContent=new Date(y,m,d).toLocaleDateString("en",{weekday:"long",day:"numeric",month:"long"});$("#dl").innerHTML=(by[sel]||[]).map(row).join("")||'<p class="em">No sessions on this day.</p>'}
+const mv=n=>{cm+=n;if(cm<0){cm=11;cy--}if(cm>11){cm=0;cy++}cal()};$("#pv").onclick=()=>mv(-1);$("#nt").onclick=()=>mv(1);$("#cg").onclick=e=>{const b=e.target.closest(".d");if(b){sel=b.dataset.k;cal()}};
+const sig=()=>S.map(stt).join();let last="";
+setInterval(()=>{const n=Date.now(),nx=S.find(s=>stt(s)!="Finished"),b=$("#nx");if(nx){const lv=stt(nx)=="Live";b.classList.add("show");b.innerHTML=`<span>🛡</span><span><b>${lv?"Live now":"Next session"}:</b> ${esc(nx.title)} <span class="mono" style="color:var(--ac)">${lv?"ends in "+hms(nx.endTime-n):"starts in "+hms(nx.startTime-n)}</span></span>`}else b.classList.remove("show");
+$$("[data-e]").forEach(el=>el.textContent="ends in "+hms(+el.dataset.e-n));const g=sig();if(g!=last){last=g;listen();paint()}},1000);
+await load();last=sig();listen();paint();ready();
+</script></body></html>
