@@ -105,7 +105,7 @@ clearInterval(pt);cmo();room()}catch(e){toast(errMsg(e));$("#bg").disabled=false
 function room(){let qs=PK.questions.map(q=>({...q,ord:q.type=="short"?[]:PK.shuffleOptions?shuf(q.options.map((_,i)=>i),rnd(hash(me.uid+S.id+q.id))):q.options.map((_,i)=>i)}));if(PK.shuffleQuestions)qs=shuf(qs,rnd(hash(me.uid+"|"+S.id)));
 X={qs,i:0,ans:{...(SUB.answers||{})},mk:{...(SUB.marked||{})},dl:deadline(SUB.startedAt),lockEnd:0,lv:0,done:false,vc:(SUB.violationLogs||[]).length,t:null};
 document.body.classList.add("ex");Object.entries(H).forEach(([k,f])=>addEventListener(k,f,true));addEventListener("beforeunload",bu);
-if(!PREV)X.unsub=onSnapshot(ref(),d=>{const x=d.data();if(!x||X?.done)return;$("#bk").style.display=x.isBlocked?"flex":"none";if(x.status=="submitted")remote(x)},()=>{});
+if(!PREV)X.unsub=onSnapshot(ref(),d=>{const x=d.data();if(!x||X?.done)return;$("#bk").style.display=x.isBlocked?"flex":"none";if(x.status=="submitted")remote(x);else if(x.forceSubmit)finish(false,true)},()=>{});
 screen(`<header class="tb2"><h2>${esc(S.title)}</h2>${PREV?'<span class="chipv">👁 Preview · nothing is saved</span>':""}<span class="chipv" id="pr"></span><span class="chipv w" title="Recorded violations">⚠ <span id="vc">${X.vc}</span></span><span class="tm mono" id="tm"></span><button class="btn p" data-a="sub">Submit exam</button></header>
 <div class="wrap"><div class="rm"><div class="card" id="qp"></div><div class="card"><b>Questions</b><div class="nums" id="nums"></div><div class="lg2"><span><i style="background:var(--g)"></i>Answered</span><span><i style="background:var(--y)"></i>Review</span><span><i style="background:rgba(143,152,201,.5)"></i>Unanswered</span></div></div></div></div>`);
 drawQ();X.t=setInterval(tick,500);tick();setTimeout(()=>chkFS(true),700)}
@@ -143,10 +143,10 @@ function stopRoom(){if(!X)return;X.done=true;clearInterval(X.t);clearTimeout(X.s
 async function doSubmit(ans,mk,start){const g=grade(PK.questions,ans),n=Date.now(),d={answers:ans,marked:mk,status:"submitted",score:g.score,correctCount:g.correct,wrongCount:g.wrong,timeSpent:n-start,finishedAt:n};
 if(PREV)return{d};
 for(let i=0;i<4;i++){try{await updateDoc(ref(),d);return{d}}catch(e){await new Promise(r=>setTimeout(r,1500))}}return null}
-async function finish(auto){if(!X||X.done)return;const ans=X.ans,mk=X.mk,st=SUB.startedAt;stopRoom();
+async function finish(auto,staff){if(!X||X.done)return;const ans=X.ans,mk=X.mk,st=SUB.startedAt;stopRoom();
 screen(`<div class="card pre"><h1>Submitting…</h1><p class="em">${auto?"Time is up. ":""}Saving your answers. Please don’t close this page.</p></div>`);
-const r=await doSubmit(ans,mk,st);if(r)return done({...SUB,...r.d},false,auto);
-screen(`<div class="card pre"><h1>Couldn’t submit</h1><p class="em">We couldn’t reach the server. Your answers are saved on this page. Check your connection and try again.</p><button class="btn p" id="rt">Try again</button></div>`);$("#rt").onclick=async()=>{const r=await doSubmit(ans,mk,st);r?done({...SUB,...r.d},false,auto):toast("Still can’t reach the server.")}}
+const r=await doSubmit(ans,mk,st);if(r)return done({...SUB,...r.d},false,auto,staff);
+screen(`<div class="card pre"><h1>Couldn’t submit</h1><p class="em">We couldn’t reach the server. Your answers are saved on this page. Check your connection and try again.</p><button class="btn p" id="rt">Try again</button></div>`);$("#rt").onclick=async()=>{const r=await doSubmit(ans,mk,st);r?done({...SUB,...r.d},false,auto,staff):toast("Still can’t reach the server.")}}
 function remote(x){const ans=x.answers||X.ans;stopRoom();done({...SUB,...x,answers:ans},false,false,true)}
 function done(x,already,auto,byStaff){const an=PK.questions.filter(q=>has((x.answers||{})[q.id])).length;
 screen(`<div class="card pre" style="text-align:center"><div style="font-size:3rem">✅</div><h1>${already?"You have already completed this exam":"Exam submitted"}</h1><p class="em">${byStaff?"Your exam was submitted by your proctor. ":auto?"Time ran out, so your exam was submitted automatically. ":""}${PREV?"This was a preview, so nothing was saved.":`Your answers were recorded${S.resultsPublished?"":". Your result will appear on your dashboard once your organizer publishes it"}.`}</p>
