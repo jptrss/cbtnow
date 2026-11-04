@@ -34,14 +34,15 @@ input[type=checkbox],input[type=radio]{width:auto;padding:0;margin:0;accent-colo
 </style></head>
 <body><div class="bgfx"></div><div class="load" id="load"><i></i></div>
 <div id="root"></div><div class="mo" id="mo"></div><div class="toast" id="toast"></div>
-<div class="ov" id="lk"><div class="ic">⚠️</div><h2>Violation Detected! Examination paused for 1 minute.</h2><p id="lt" style="color:#8f98c9"></p><div class="big mono" id="lc"></div><small style="color:#8f98c9">Your exam timer keeps running. Every violation is reported to your proctor.</small></div>
+<div class="ov" id="lk" style="z-index:101"><div class="ic">⚠️</div><h2>Violation Detected! Examination paused for 1 minute.</h2><p id="lt" style="color:#8f98c9"></p><div class="big mono" id="lc"></div><small style="color:#8f98c9">Your exam timer keeps running. Every violation is reported to your proctor.</small></div>
 <div class="ov" id="bk"><div class="ic">⛔</div><h2>You have been blocked by the proctor.</h2><p style="color:#8f98c9">Please wait. Your proctor will unblock you or contact you. Your timer keeps running.</p></div>
+<div class="ov" id="fs" style="z-index:99"><div class="ic">🖥️</div><h2>Full screen is required for this exam</h2><p style="color:#8f98c9;max-width:480px">Click the button to return to full screen and continue. Your timer keeps running.</p><button class="btn p" id="fsb" style="font-size:1.05rem;padding:12px 26px">Enter full screen</button></div>
 
 <script type="module">
 import{$,esc,toast,guard,errMsg,ready,db}from"/assets/core.js";
 import{doc,getDoc,setDoc,updateDoc,onSnapshot,arrayUnion}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const me=await guard("PARTICIPANT",["MANAGEMENT","PROBLEM_SETTER"]),sid=decodeURIComponent(location.hash.slice(1)),PREV=sid.startsWith("preview:"),PID=PREV?sid.slice(8):"",BACK=PREV?"/management/question":"/participant/dashboard",LET="ABCDEFGHIJ",$$=s=>[...document.querySelectorAll(s)];
-let S,PK,SUB,X=null,pt=null;
+let S,PK,SUB,X=null,pt=null,bt=null;
 
 // ---------- helpers ----------
 const fdt=t=>new Date(t).toLocaleString([],{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
@@ -60,6 +61,11 @@ if(q.type=="mcq"){const ok=q.correct[0]===+v;return{pts:ok?q.score:0,ok,ans:true
 const sel=new Set([].concat(v).map(Number)),cor=new Set(q.correct),r=[...sel].filter(x=>cor.has(x)).length,w=sel.size-r,ok=r==cor.size&&w==0;return{pts:q.scoring=="partial"?+(q.score*Math.max(0,(r-w)/cor.size)).toFixed(2):ok?q.score:0,ok,ans:true}}
 function grade(qs,a){let score=0,correct=0,wrong=0;qs.forEach(q=>{const g=gradeQ(q,(a||{})[q.id]);score+=g.pts;if(g.ans){g.ok?correct++:wrong++}});return{score:+score.toFixed(2),correct,wrong}}
 const deadline=st=>Math.min(st+S.durationMinutes*6e4,S.endTime),ref=()=>doc(db,"exam_submissions",`${S.id}_${me.uid}`),R=()=>S.violationRules||{tab:true,copy:true,shot:true};
+const FSR=()=>R().fullscreen!==false,canFS=!!(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen),inFS=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+const enterFS=()=>{try{const e=document.documentElement,p=(e.requestFullscreen||e.webkitRequestFullscreen).call(e);p&&p.catch&&p.catch(()=>{})}catch{}};
+const exitFS=()=>{try{if(inFS()){const p=(document.exitFullscreen||document.webkitExitFullscreen).call(document);p&&p.catch&&p.catch(()=>{})}}catch{}};
+function chkFS(initial){if(!X||X.done||!FSR()||!canFS)return;const o=$("#fs");if(inFS()){o.style.display="none";return}o.style.display="flex";if(!initial)viol("fs","Exited full screen")}
+$("#fsb").onclick=enterFS;
 const maxPts=()=>PK.questions.reduce((a,q)=>a+(+q.score||0),0);
 
 // ---------- screens ----------
@@ -81,18 +87,18 @@ screen(`<div class="card pre"><span class="chipv">${PREV?"👁 Preview mode":SUB
 <div class="mg"><div><b>${S.durationMinutes} min</b><span>Duration</span></div><div><b>${n}</b><span>Questions</span></div><div><b>${maxPts()}</b><span>Total points</span></div><div><b>${PREV?"Preview":fdt(S.endTime)}</b><span>${PREV?"Nothing is saved":"Hard end time"}</span></div></div>
 <div class="cdb" id="cd"></div>
 <h3>Before you start</h3><ul><li>${PREV?`Your timer is ${S.durationMinutes} minutes. The exam is submitted automatically when time is up.`:`Your timer is personal (${S.durationMinutes} minutes) but the exam always closes at ${fdt(S.endTime)}. It is submitted automatically when time is up.`}</li><li>Answers are saved automatically. If you reload, you can resume, and the timer keeps running.</li>
-${r.tab?"<li>Do not switch tabs or apps, and keep this window focused.</li>":""}${r.copy?"<li>Copying, pasting, right-click and text selection are disabled.</li>":""}${r.shot?"<li>Screenshot keys are blocked and recorded.</li>":""}<li>Every violation <b>pauses your exam for 1 minute</b> and is reported to your proctor with the exact time.</li></ul>
+${r.tab?"<li>Do not open another tab or app while the exam is running.</li>":""}${FSR()&&canFS?"<li>The exam runs in <b>full screen</b>. Leaving full screen pauses your exam for 1 minute.</li>":""}${r.copy?"<li>Copying, pasting, right-click and text selection are disabled.</li>":""}${r.shot?"<li>Screenshot keys are blocked and recorded.</li>":""}<li>Every violation <b>pauses your exam for 1 minute</b> and is reported to your proctor with the exact time.</li></ul>
 ${blocked?'<p class="bad" style="color:var(--r)">You are currently blocked by the proctor.</p>':""}
 <div class="rw"><a class="btn" href="${BACK}">← Back</a><button class="btn p" id="go" style="flex:1">${PREV?"▶ Start preview":"🔑 Enter token &amp; start"}</button></div></div>`);
 const ph=()=>Date.now()<S.startTime?0:Date.now()>S.endTime?2:1,upd=()=>{const c=$("#cd"),b=$("#go");if(!c){clearInterval(pt);return}const p=ph(),n=Date.now();
 c.textContent=PREV?"Preview ready":p==0?"Starts in "+hms(S.startTime-n):p==1?"Open · closes in "+hms(S.endTime-n):"This exam has ended";c.style.borderColor=p==1?"var(--g)":"var(--line)";b.disabled=p!=1||!!blocked};
 upd();clearInterval(pt);pt=setInterval(upd,500);$("#go").onclick=PREV?startPrev:tokenModal}
-function startPrev(){const n=Date.now();SUB={id:"preview",answers:{},marked:{},status:"in_progress",startedAt:n,violationLogs:[],isBlocked:false};clearInterval(pt);room()}
+function startPrev(){if(FSR()&&canFS)enterFS();const n=Date.now();SUB={id:"preview",answers:{},marked:{},status:"in_progress",startedAt:n,violationLogs:[],isBlocked:false};clearInterval(pt);room()}
 function tokenModal(){mo(`<h3>Enter your exam token</h3><p class="em" style="padding-top:0">Your proctor will give you the token.</p><input id="tk" class="mono" autocomplete="off" placeholder="TOKEN" style="text-transform:uppercase;font-size:1.3rem;letter-spacing:.25em;text-align:center">
 <label class="ag"><input type="checkbox" id="ag"><span>I agree to uphold exam integrity. I understand that leaving this page, copying or pasting, and taking screenshots are recorded, pause my exam for 1 minute, and are visible to my proctors.</span></label>
 <div class="rw"><button class="btn" data-x style="flex:1">Cancel</button><button class="btn p" id="bg" style="flex:1">Begin exam</button></div>`);$("#tk").focus();$("#tk").onkeydown=e=>{if(e.key=="Enter")$("#bg").click()};
 $("#bg").onclick=async()=>{const t=$("#tk").value.trim().toUpperCase();if(Date.now()<S.startTime||Date.now()>S.endTime)return toast("The exam isn’t open right now.");if(!t)return toast("Enter the token.");if(t!==String(S.token).toUpperCase())return toast("Invalid token.");if(!$("#ag").checked)return toast("You must accept the integrity agreement.");
-$("#bg").disabled=true;try{if(!SUB){const n=Date.now(),x={id:ref().id,sessionId:S.id,participantUid:me.uid,participantName:me.name,answers:{},marked:{},status:"in_progress",startedAt:n,violationLogs:[],isBlocked:false,forceSubmit:false,notes:""};await setDoc(ref(),x);SUB=x}
+if(FSR()&&canFS)enterFS();$("#bg").disabled=true;try{if(!SUB){const n=Date.now(),x={id:ref().id,sessionId:S.id,participantUid:me.uid,participantName:me.name,answers:{},marked:{},status:"in_progress",startedAt:n,violationLogs:[],isBlocked:false,forceSubmit:false,notes:""};await setDoc(ref(),x);SUB=x}
 clearInterval(pt);cmo();room()}catch(e){toast(errMsg(e));$("#bg").disabled=false}}}
 
 // ---------- exam workspace ----------
@@ -102,7 +108,7 @@ document.body.classList.add("ex");Object.entries(H).forEach(([k,f])=>addEventLis
 if(!PREV)X.unsub=onSnapshot(ref(),d=>{const x=d.data();if(!x||X?.done)return;$("#bk").style.display=x.isBlocked?"flex":"none";if(x.status=="submitted")remote(x)},()=>{});
 screen(`<header class="tb2"><h2>${esc(S.title)}</h2>${PREV?'<span class="chipv">👁 Preview · nothing is saved</span>':""}<span class="chipv" id="pr"></span><span class="chipv w" title="Recorded violations">⚠ <span id="vc">${X.vc}</span></span><span class="tm mono" id="tm"></span><button class="btn p" data-a="sub">Submit exam</button></header>
 <div class="wrap"><div class="rm"><div class="card" id="qp"></div><div class="card"><b>Questions</b><div class="nums" id="nums"></div><div class="lg2"><span><i style="background:var(--g)"></i>Answered</span><span><i style="background:var(--y)"></i>Review</span><span><i style="background:rgba(143,152,201,.5)"></i>Unanswered</span></div></div></div></div>`);
-drawQ();X.t=setInterval(tick,500);tick()}
+drawQ();X.t=setInterval(tick,500);tick();setTimeout(()=>chkFS(true),700)}
 function drawQ(){const q=X.qs[X.i],n=X.qs.length,a=X.ans[q.id],on=o=>q.type=="mcq"?a===o:(a||[]).includes(o);
 $("#qp").innerHTML=`<div class="rw"><b style="font-size:1.1rem">Question ${X.i+1} <span style="color:var(--mu);font-weight:400">of ${n}</span></b><span class="tag a">${q.score} pt</span><span class="tag">${q.type=="mcq"?"Choose one":q.type=="complex"?"Choose all that apply":"Short answer"}</span>${X.mk[q.id]?'<span class="tag" style="color:var(--y)">Marked for review</span>':""}</div>
 <div class="qt">${clean(q.text)}</div>${q.type=="short"?`<input type="text" id="sa" autocomplete="off" spellcheck="false" placeholder="Type your answer" value="${esc(a??"")}" style="font-size:1.1rem">`:q.ord.map((o,k)=>`<label class="opt ${on(o)?"on":""}"><input type="${q.type=="mcq"?"radio":"checkbox"}" name="o" data-o="${o}" ${on(o)?"checked":""}><b>${LET[k]}</b><span>${esc(q.options[o].t)}${q.options[o].img?`<img src="${esc(q.options[o].img)}" alt="">`:""}</span></label>`).join("")}
@@ -125,15 +131,15 @@ if(X.lockEnd){const r=Math.ceil((X.lockEnd-Date.now())/1e3),lk=$("#lk");if(r<=0)
 
 // ---------- proctoring ----------
 const pv=c=>e=>{e.preventDefault();viol(c,e.type=="contextmenu"?"Right-click attempt":"Clipboard: "+e.type)};
-const H={visibilitychange:()=>document.hidden&&viol("tab","Tab switch / app hidden"),blur:()=>viol("tab","Window lost focus"),copy:pv("copy"),cut:pv("copy"),paste:pv("copy"),contextmenu:pv("copy"),dragstart:e=>e.preventDefault(),
+const H={visibilitychange:()=>document.hidden&&viol("tab","Tab switch / app hidden"),blur:e=>{if(e.target!==window)return;clearTimeout(bt);bt=setTimeout(()=>{if(X&&!X.done&&!document.hidden&&!document.hasFocus()&&Date.now()-X.lv>4000)viol("tab","Switched to another app or window")},2000)},focus:e=>{if(e.target===window)clearTimeout(bt)},fullscreenchange:()=>chkFS(false),webkitfullscreenchange:()=>chkFS(false),copy:pv("copy"),cut:pv("copy"),paste:pv("copy"),contextmenu:pv("copy"),dragstart:e=>e.preventDefault(),
 keyup:e=>{if(e.key=="PrintScreen"){navigator.clipboard?.writeText("").catch(()=>{});viol("shot","PrintScreen pressed")}},
-keydown:e=>{const k=e.key.toLowerCase(),m=e.ctrlKey||e.metaKey;if(m&&e.shiftKey&&k=="s"){e.preventDefault();return viol("shot","Screenshot shortcut")}if(m&&["c","v","x","p","s","u"].includes(k)){e.preventDefault();viol("copy","Blocked shortcut: "+k.toUpperCase())}}};
-function viol(cat,t){if(!X||X.done||Date.now()-X.lv<1500)return;X.lv=Date.now();if(!R()[cat])return;X.vc++;$("#vc").textContent=X.vc;
+keydown:e=>{const k=e.key.toLowerCase(),m=e.ctrlKey||e.metaKey;if(m&&e.shiftKey&&k=="s"){e.preventDefault();return viol("shot","Screenshot shortcut")}if(m&&!e.altKey&&["c","v","x","p","s","u"].includes(k)){e.preventDefault();viol("copy","Blocked shortcut: "+k.toUpperCase())}}};
+function viol(cat,t){if(!X||X.done||Date.now()-X.lv<1500)return;X.lv=Date.now();if(cat=="fs"?!FSR():!R()[cat])return;X.vc++;$("#vc").textContent=X.vc;
 if(!PREV)updateDoc(ref(),{violationLogs:arrayUnion({type:t,at:Date.now()})}).catch(()=>{});$("#lt").textContent=`Violation ${X.vc}: ${t}`;document.activeElement?.blur?.();if(!X.lockEnd)X.lockEnd=Date.now()+6e4;tick()}
 const bu=e=>{if(X&&!X.done){e.preventDefault();e.returnValue=""}};
 
 // ---------- finishing ----------
-function stopRoom(){if(!X)return;X.done=true;clearInterval(X.t);clearTimeout(X.s);X.unsub&&X.unsub();Object.entries(H).forEach(([k,f])=>removeEventListener(k,f,true));removeEventListener("beforeunload",bu);document.body.classList.remove("ex");["#lk","#bk"].forEach(s=>$(s).style.display="none");cmo()}
+function stopRoom(){if(!X)return;X.done=true;clearInterval(X.t);clearTimeout(X.s);X.unsub&&X.unsub();Object.entries(H).forEach(([k,f])=>removeEventListener(k,f,true));removeEventListener("beforeunload",bu);document.body.classList.remove("ex");clearTimeout(bt);["#lk","#bk","#fs"].forEach(s=>$(s).style.display="none");cmo();exitFS()}
 async function doSubmit(ans,mk,start){const g=grade(PK.questions,ans),n=Date.now(),d={answers:ans,marked:mk,status:"submitted",score:g.score,correctCount:g.correct,wrongCount:g.wrong,timeSpent:n-start,finishedAt:n};
 if(PREV)return{d};
 for(let i=0;i<4;i++){try{await updateDoc(ref(),d);return{d}}catch(e){await new Promise(r=>setTimeout(r,1500))}}return null}
