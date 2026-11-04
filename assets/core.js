@@ -58,3 +58,6 @@ const _fail=m=>{const l=document.getElementById("load");if(l&&!l.classList.conta
 addEventListener("unhandledrejection",e=>_fail(e.reason?.code||e.reason?.message||"Unexpected error"));
 addEventListener("error",e=>_fail(e.message||"Unexpected error"));
 setTimeout(()=>_fail("It is taking too long to respond."),12000);
+
+// Proctor menu
+NAV.PROCTOR=[["dash","🏠","Dashboard","/proctor/dashboard"],["exams","🛡","Exams","/proctor/exams"],["profile","👤","Profile","/proctor/profile"]];
