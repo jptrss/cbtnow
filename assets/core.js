@@ -20,11 +20,11 @@ export const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("show
 export const greet=()=>{const h=new Date().getHours();return h<5?"Good night":h<12?"Good morning":h<17?"Good afternoon":h<21?"Good evening":"Good night"};
 
 // Resolves with the signed-in user's profile when it matches `role`; otherwise redirects.
-export function guard(role){return new Promise(res=>onAuthStateChanged(auth,async u=>{
+export function guard(role,also=[]){return new Promise(res=>onAuthStateChanged(auth,async u=>{
 if(!u)return location.replace("/login");
 const s=await getDoc(doc(db,"users",u.uid)),d=s.exists()?s.data():null;
 if(!d||!ROUTES[d.role]){await signOut(auth);return location.replace("/login")}
-if(d.role!==role)return location.replace(ROUTES[d.role]);
+if(d.role!==role&&!also.includes(d.role))return location.replace(ROUTES[d.role]);
 res({uid:u.uid,...d})}))}
 
 // Sidebar: nav = [[key, icon, label, href], ...]
@@ -52,3 +52,9 @@ export const NAV={MANAGEMENT:[["dash","🏠","Dashboard","/management/dashboard"
 
 // Participant menu (the exam room page is built in a later step: set its href then)
 NAV.PARTICIPANT=[["dash","🏠","Dashboard","/participant/dashboard"],["exam","📝","My exams","/participant/exams"],["profile","👤","Profile","/participant/profile"]];
+
+// ---- Visible diagnostics: if a page can't finish loading, show why instead of an endless spinner ----
+const _fail=m=>{const l=document.getElementById("load");if(l&&!l.classList.contains("h"))l.innerHTML=`<div style="max-width:460px;padding:24px;text-align:center;color:#e8ebff;font:15px/1.6 Inter,system-ui,sans-serif"><h2 style="margin-bottom:8px">This page couldn’t load</h2><p style="color:#8f98c9">${esc(m)}</p><p style="color:#8f98c9;font-size:.85rem">Press F12 and open Console for details. Common causes: Firebase config not filled in, Firestore rules not published, or no internet connection.</p><a href="/login" style="color:#a5b4fc">Back to sign in</a></div>`};
+addEventListener("unhandledrejection",e=>_fail(e.reason?.code||e.reason?.message||"Unexpected error"));
+addEventListener("error",e=>_fail(e.message||"Unexpected error"));
+setTimeout(()=>_fail("It is taking too long to respond."),12000);
