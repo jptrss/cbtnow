@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exams · Proctor · CBTNow</title><meta name="robots" content="noindex">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("cbtnow-theme")||"dark"}catch{}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2724%27 fill=%27%236366f1%27/><path d=%27M28 52l16 16 30-34%27 stroke=%27white%27 stroke-width=%2712%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="/assets/theme.css">
+<style>
+.btn.on{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 20%,transparent)}.tag.r{color:var(--r);border-color:rgba(248,113,113,.5)}.tag.y{color:var(--y);border-color:rgba(251,191,36,.5)}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}.pk{margin:0;display:flex;flex-direction:column;gap:9px}.pk h3{margin:0}.mt{color:var(--mu);font-size:.86rem}.mt b{color:var(--tx)}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 16px}.bar input{max-width:320px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:780px}th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:.86rem;vertical-align:middle}th{color:var(--mu);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.05em}td small{display:block;color:var(--mu)}
+.hd{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 16px;border:1px solid var(--line);border-radius:18px;background:var(--card);margin-bottom:14px}.hd h2{margin:0;font-size:1.4rem}
+.fd.w span{color:var(--r)}.mo .card.wd{width:min(640px,100%)}.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}.mg div{padding:10px 12px;border:1px solid var(--line);border-radius:12px}.mg b{display:block;font:700 1.1rem "Space Grotesk"}.mg span{color:var(--mu);font-size:.78rem}
+</style></head>
+<body><div class="bgfx"></div><div class="load" id="load"><i></i></div>
+<div class="app"><aside id="side"></aside><main>
+<section class="hero" id="hero"><div><h1>Exam sessions</h1><p>Sessions assigned to you. Open one to monitor participants live.</p></div><div class="clk"><div class="big mono" id="ck"></div><small id="dtx"></small></div></section>
+<div class="stats" id="stats"></div>
+<div id="v"></div>
+</main></div><div class="mo" id="mo"></div><div class="toast" id="toast"></div>
+<script type="module">
+import{$,esc,toast,guard,shell,hero,ready,errMsg,db,NAV}from"/assets/core.js";
+import{collection,doc,getDoc,getDocs,updateDoc,query,where,onSnapshot,documentId}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const me=await guard("PROCTOR");shell(me,NAV.PROCTOR,"exams");hero(me);
+const $$=s=>[...document.querySelectorAll(s)];
+const fdt=t=>t?new Date(t).toLocaleString([],{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"-";
+const hms=ms=>{const s=Math.max(0,Math.round(ms/1e3)),d=Math.floor(s/86400);return(d?d+"d ":"")+[Math.floor(s%86400/3600),Math.floor(s/60)%60,s%60].map(n=>String(n).padStart(2,"0")).join(":")};
+const mo=h=>{$("#mo").innerHTML=`<div class="card wd">${h}</div>`;$("#mo").classList.add("show")};$("#mo").onclick=e=>{if(e.target.id=="mo"||e.target.closest("[data-x]"))$("#mo").classList.remove("show")};
+const has=v=>v!=null&&v!==""&&!(Array.isArray(v)&&!v.length);
+let S=[],EVM={},CS=null,PK={questions:[]},UM={},subs=[],unsub=null,tick=null,FT="live";
+const stt=s=>{const n=Date.now();return n<s.startTime?"Upcoming":n>s.endTime?"Finished":"Live"};
+const stTag=s=>{const x=stt(s);return`<span class="tag ${x=="Live"?"g":x=="Upcoming"?"a":""}">${x}</span>`};
+const showHero=b=>$("#hero").style.display=$("#stats").style.display=b?"":"none";
+async function loadAll(){try{S=(await getDocs(query(collection(db,"exam_sessions"),where("assignedProctorUids","array-contains",me.uid)))).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.startTime-b.startTime);
+await Promise.all([...new Set(S.map(s=>s.eventId))].filter(i=>!EVM[i]).map(async i=>{try{const d=await getDoc(doc(db,"events",i));if(d.exists())EVM[i]=d.data()}catch{}}))}catch(x){toast(errMsg(x))}}
+function leave(){unsub&&unsub();unsub=null;clearInterval(tick);CS=null;subs=[]}
+async function route(){const m=location.hash.match(/^#\/session\/(.+)$/);
+if(m){if(CS&&CS.id==m[1]&&unsub)return;await loadAll();return viewSession(m[1])}leave();await loadAll();viewList()}
+addEventListener("hashchange",route);
+
+// ---------- sessions list ----------
+function viewList(){showHero(true);const c=k=>S.filter(s=>stt(s)==k).length;
+$("#stats").innerHTML=[["Live now",c("Live")],["Upcoming",c("Upcoming")],["Finished",c("Finished")],["Assigned",S.length]].map(([l,v],i)=>`<div class="st" style="animation-delay:${i*60}ms"><b>${v}</b><span>${l}</span></div>`).join("");
+$("#v").innerHTML=`<div class="bar"><div class="seg" id="ft" style="flex-wrap:wrap"></div><span style="flex:1"></span><input id="q" placeholder="Search sessions…"></div><div class="pg" id="pg"></div>`;$("#q").oninput=drawList;$("#ft").onclick=e=>{const b=e.target.closest("[data-f]");if(b){FT=b.dataset.f;drawList()}};drawList()}
+function drawList(){const q=$("#q").value.toLowerCase(),L=S.filter(s=>(FT=="all"||stt(s).toLowerCase()==FT)&&(!q||(s.title+" "+(EVM[s.eventId]?.title||"")).toLowerCase().includes(q)));
+$("#ft").innerHTML=[["live","Live"],["upcoming","Upcoming"],["finished","Finished"],["all","All"]].map(([k,l])=>`<button class="btn ${FT==k?"on":""}" data-f="${k}">${l}</button>`).join("");
+$("#pg").innerHTML=(FT=="finished"?[...L].reverse():L).map(s=>`<div class="card pk"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><h3>${esc(s.title)}</h3>${stTag(s)}</div><div class="mt">🏷 ${esc(EVM[s.eventId]?.title||"Exam")}</div><div class="mt">🗓 ${fdt(s.startTime)} → ${fdt(s.endTime)}</div><div class="mt">⏱ ${s.durationMinutes} min · 👥 ${(s.assignedParticipantUids||[]).length} participants</div>
+<div class="mt">🔑 Token: <b class="mono" id="t${s.id}" data-t="${esc(s.token)}">••••••</b> <button class="btn s" data-a="tk" data-id="${s.id}">Show</button> <button class="btn s" data-a="cp" data-id="${s.id}">Copy</button></div>
+<div class="rw" style="margin-top:auto"><a class="btn p" href="#/session/${s.id}" style="flex:1">📡 Monitor</a></div></div>`).join("")||`<div class="card" style="grid-column:1/-1"><p class="em">${S.length?"No sessions in this view.":"No sessions have been assigned to you yet."}</p></div>`}
+$("#v").addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,s=S.find(x=>x.id==b.dataset.id);
+if(a=="tk"){const t=$("#t"+s.id),h=t.textContent.includes("•");t.textContent=h?t.dataset.t:"••••••";b.textContent=h?"Hide":"Show"}
+if(a=="cp")navigator.clipboard.writeText(s.token).then(()=>toast("Token copied."));if(a=="back")location.hash=""});
+
+// ---------- live monitor ----------
+const chunks=(a,n)=>Array.from({length:Math.ceil(a.length/n)},(_,i)=>a.slice(i*n,i*n+n));
+async function viewSession(id){CS=S.find(x=>x.id==id);if(!CS){toast("Session not found, or it isn’t assigned to you.");location.hash="";return}showHero(false);leave2();
+try{const p=await getDoc(doc(db,"question_packages",CS.packageId));PK=p.exists()?p.data():{questions:[]}}catch{PK={questions:[]}}
+UM={};try{await Promise.all(chunks(CS.assignedParticipantUids||[],30).map(async c=>(await getDocs(query(collection(db,"users"),where(documentId(),"in",c)))).docs.forEach(d=>UM[d.id]={id:d.id,...d.data()})))}catch(x){toast(errMsg(x))}
+unsub=onSnapshot(query(collection(db,"exam_submissions"),where("sessionId","==",CS.id)),q=>{subs=q.docs.map(d=>({id:d.id,...d.data()}));drawLive()},x=>toast(errMsg(x)));
+const s=CS;$("#v").innerHTML=`<div class="hd"><button class="btn s" data-a="back">← Sessions</button><div style="flex:1;min-width:220px"><h2>${esc(s.title)} ${stTag(s)}</h2><small style="color:var(--mu)">🏷 ${esc(EVM[s.eventId]?.title||"Exam")} · ${fdt(s.startTime)} → ${fdt(s.endTime)} · ${s.durationMinutes} min</small></div><div class="mono" id="cd" style="color:var(--ac);font-size:1.1rem"></div><span class="mt">🔑 <b class="mono" id="tkn" data-t="${esc(s.token)}">••••••</b> <button class="btn s" data-a="tk2">Show</button></span></div><div id="sc"></div>`;
+$("#v").querySelector("[data-a=tk2]").onclick=e=>{const t=$("#tkn"),h=t.textContent.includes("•");t.textContent=h?t.dataset.t:"••••••";e.target.textContent=h?"Hide":"Show"};
+drawLive();clearInterval(tick);tick=setInterval(()=>{const n=Date.now(),c=$("#cd");if(c)c.textContent=n<s.startTime?"starts in "+hms(s.startTime-n):n<=s.endTime?"ends in "+hms(s.endTime-n):"finished";$$("[data-dl]").forEach(el=>el.textContent=hms(+el.dataset.dl-n))},1000)}
+const leave2=()=>{unsub&&unsub();unsub=null;clearInterval(tick);subs=[]};
+const stOf=x=>!x?"Not started":x.isBlocked?"Blocked":x.status=="submitted"?"Submitted":"In progress";
+const stCls=k=>({Submitted:"g","In progress":"a",Blocked:"r","Not started":""}[k]);
+function drawLive(){if(!CS||!$("#sc"))return;const ids=CS.assignedParticipantUids||[],R=ids.map(id=>({u:UM[id]||{id,name:"(unknown)",loginId:id},x:subs.find(b=>b.participantUid==id)})),c=k=>R.filter(r=>stOf(r.x)==k).length,vl=subs.reduce((a,x)=>a+(x.violationLogs||[]).length,0),qn=PK.questions.length,
+logs=subs.flatMap(x=>(x.violationLogs||[]).map(v=>({...v,n:x.participantName}))).sort((a,b)=>b.at-a.at).slice(0,40);
+$("#sc").innerHTML=`<div class="stats" style="margin-top:0">${[["Enrolled",R.length],["Not started",c("Not started")],["In progress",c("In progress")],["Submitted",c("Submitted")],["Blocked",c("Blocked")],["Violations",vl]].map(([l,v])=>`<div class="st"><b>${v}</b><span>${l}</span></div>`).join("")}</div>
+<div class="card"><h3>Participants (live)</h3><div class="tw"><table><thead><tr><th>Participant</th><th>Status</th><th>Answered</th><th>Time left</th><th>Violations</th><th>Notes</th><th></th></tr></thead><tbody>${R.map(({u,x})=>{const dl=x&&x.status!="submitted"&&x.startedAt?Math.min(x.startedAt+CS.durationMinutes*6e4,CS.endTime):0,an=x?PK.questions.filter(q=>has((x.answers||{})[q.id])).length:0,fr=x&&x.forceSubmit&&x.status!="submitted";
+return`<tr><td><b>${esc(u.name)}</b><small>${esc(u.loginId||u.email||"")} · ${esc(u.institution||"-")}</small></td><td><span class="tag ${stCls(stOf(x))}">${stOf(x)}</span>${fr?' <span class="tag y">Force-submit sent</span>':""}</td><td>${x?`${an}/${qn}`:"-"}</td><td class="mono" ${dl?`data-dl="${dl}"`:""}>${dl?hms(dl-Date.now()):"-"}</td><td>${(x?.violationLogs||[]).length||"-"}</td><td>${esc(x?.notes||"")}</td><td style="white-space:nowrap">${x?`<button class="btn s" data-a="blk" data-id="${x.id}">${x.isBlocked?"Unblock":"Block"}</button> <button class="btn s" data-a="note" data-id="${x.id}">Note</button> ${x.status!="submitted"?`<button class="btn s x" data-a="force" data-id="${x.id}">Force submit</button> `:""}<button class="btn s" data-a="det" data-id="${x.id}">Detail</button>`:""}</td></tr>`}).join("")||'<tr><td colspan="7" class="em">No participants assigned.</td></tr>'}</tbody></table></div></div>
+<div class="card"><h3>Violation log</h3>${logs.map(v=>`<div class="fd w"><span>${esc(v.n)}: ${esc(v.type)}</span><small>${fdt(v.at)}</small></div>`).join("")||'<p class="em">No violations recorded.</p>'}</div>`}
+const sub=id=>subs.find(x=>x.id==id),sref=id=>doc(db,"exam_submissions",id);
+$("#v").addEventListener("click",async e=>{const b=e.target.closest("[data-a]");if(!b||!CS)return;const a=b.dataset.a,id=b.dataset.id,x=sub(id);if(!x)return;
+try{if(a=="blk")return await updateDoc(sref(id),{isBlocked:!x.isBlocked});
+if(a=="note"){const n=prompt("Note for this participant:",x.notes||"");if(n!==null)await updateDoc(sref(id),{notes:n});return}
+if(a=="force"){if(!confirm(`Force-submit ${x.participantName}’s exam now? Their saved answers will be submitted.`))return;await updateDoc(sref(id),{forceSubmit:true});return toast("Force-submit sent. The participant’s exam closes within seconds.")}
+if(a=="det"){const qn=PK.questions.length,an=PK.questions.filter(q=>has((x.answers||{})[q.id])).length,u=UM[x.participantUid]||{name:x.participantName};
+mo(`<h3><span>${esc(u.name)} <small style="color:var(--mu)">${esc(u.loginId||"")}</small></span><span class="tag ${stCls(stOf(x))}">${stOf(x)}</span></h3><div class="mg"><div><b>${fdt(x.startedAt)}</b><span>Started</span></div><div><b>${x.status=="submitted"?fdt(x.finishedAt):"-"}</b><span>Finished</span></div><div><b>${an} / ${qn}</b><span>Answered</span></div><div><b>${(x.violationLogs||[]).length}</b><span>Violations</span></div></div>${x.notes?`<p class="em" style="padding:0">📝 ${esc(x.notes)}</p>`:""}
+<h4 style="margin:12px 0 4px">Violation timeline</h4>${(x.violationLogs||[]).slice().sort((p,q)=>q.at-p.at).map(v=>`<div class="fd w"><span>${esc(v.type)}</span><small>${new Date(v.at).toLocaleTimeString()}</small></div>`).join("")||'<p class="em">No violations.</p>'}<div class="rw" style="margin-top:14px"><button class="btn" data-x style="flex:1">Close</button></div>`)}}catch(z){toast(errMsg(z))}});
+
+await route();ready();
+</script></body></html>
