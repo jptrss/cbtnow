@@ -61,3 +61,6 @@ setTimeout(()=>_fail("It is taking too long to respond."),12000);
 
 // Proctor menu
 NAV.PROCTOR=[["dash","🏠","Dashboard","/proctor/dashboard"],["exams","🛡","Exams","/proctor/exams"],["profile","👤","Profile","/proctor/profile"]];
+
+// Problem Setter menu
+NAV.PROBLEM_SETTER=[["dash","🏠","Dashboard","/probset/dashboard"],["question","📚","Questions","/probset/question"],["profile","👤","Profile","/probset/profile"]];
