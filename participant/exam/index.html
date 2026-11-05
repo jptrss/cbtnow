@@ -41,7 +41,7 @@ input[type=checkbox],input[type=radio]{width:auto;padding:0;margin:0;accent-colo
 <script type="module">
 import{$,esc,toast,guard,errMsg,ready,db}from"/assets/core.js";
 import{doc,getDoc,setDoc,updateDoc,onSnapshot,arrayUnion}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-const me=await guard("PARTICIPANT",["MANAGEMENT","PROBLEM_SETTER"]),sid=decodeURIComponent(location.hash.slice(1)),PREV=sid.startsWith("preview:"),PID=PREV?sid.slice(8):"",BACK=PREV?"/management/question":"/participant/dashboard",LET="ABCDEFGHIJ",$$=s=>[...document.querySelectorAll(s)];
+const me=await guard("PARTICIPANT",["MANAGEMENT","PROBLEM_SETTER"]),sid=decodeURIComponent(location.hash.slice(1)),PREV=sid.startsWith("preview:"),PID=PREV?sid.slice(8):"",BACK=PREV?(me.role=="PROBLEM_SETTER"?"/probset/question":"/management/question"):"/participant/dashboard",LET="ABCDEFGHIJ",$$=s=>[...document.querySelectorAll(s)];
 let S,PK,SUB,X=null,pt=null,bt=null;
 
 // ---------- helpers ----------
